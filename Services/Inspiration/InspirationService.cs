@@ -1,5 +1,5 @@
 ﻿namespace Nastaran_bot.Services.Inspiration;
 
-public class InspirationService
+public class InspirationService : IInspirationService
 {
 }
