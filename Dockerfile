@@ -1,30 +1,75 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# ========================
+# Stage 1: Base image for runtime
+# ========================
+# Use the lightweight ASP.NET runtime image (suitable for running the app)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+
+# Set the working directory inside the container
 WORKDIR /app
+
+# Expose port 8080 to allow traffic (Telegram webhooks, API calls, etc.)
 EXPOSE 8080
-EXPOSE 8081
 
+# ========================
+# Create a non-root user for security
+# ========================
+# 1. Create a system group named 'appgroup'
+# 2. Create a system user 'appuser' in 'appgroup'
+# 3. Change ownership of /app to 'appuser:appgroup' so the user has write permissions
+RUN addgroup --system appgroup && \
+    adduser --system --ingroup appgroup appuser && \
+    chown -R appuser:appgroup /app
 
-# This stage is used to build the service project
+# Switch to non-root user for security
+USER appuser
+
+# ========================
+# Stage 2: Build stage
+# ========================
+# Use the full SDK image for restoring, building, and publishing the .NET project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Allow passing build configuration (default: Release)
 ARG BUILD_CONFIGURATION=Release
+
+# Set working directory for build stage
 WORKDIR /src
+
+# Copy the project file first and restore dependencies (Docker layer caching)
 COPY ["Nastaran_bot.csproj", "."]
 RUN dotnet restore "./Nastaran_bot.csproj"
+
+# Copy the rest of the source code into the container
 COPY . .
+
+# Set working directory (redundant but ensures correct path)
 WORKDIR "/src/."
+
+# Build the project in the specified configuration and output to /app/build
 RUN dotnet build "./Nastaran_bot.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# ========================
+# Stage 3: Publish stage
+# ========================
+# Publish the project to a folder for deployment
 FROM build AS publish
+
+# Use the same build configuration
 ARG BUILD_CONFIGURATION=Release
+
+# Publish the app (without self-contained host, smaller image)
 RUN dotnet publish "./Nastaran_bot.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# ========================
+# Stage 4: Final image for production or regular run
+# ========================
 FROM base AS final
+
+# Set working directory
 WORKDIR /app
+
+# Copy published files from the publish stage
 COPY --from=publish /app/publish .
+
+# Set the container entrypoint to run the .NET bot
 ENTRYPOINT ["dotnet", "Nastaran_bot.dll"]
