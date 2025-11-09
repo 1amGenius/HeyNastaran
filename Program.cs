@@ -10,7 +10,7 @@ using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
 using Nastaran_bot.Services.User;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // ========================
 // 1. Add Controllers
@@ -31,7 +31,7 @@ builder.Services.AddSwaggerGen();
 // ========================
 // Register a single MongoClient as a singleton.
 // It will be shared across all repositories.
-// Ensure you have the connection string in appsettings.json:
+// Ensure you have the connection string in appsettings.Development.json:
 // "MongoDb": "mongodb+srv://<username>:<password>@cluster0.mongodb.net"
 builder.Services.AddSingleton<IMongoClient>(s =>
     new MongoClient(builder.Configuration.GetConnectionString("MongoDb")));
@@ -67,14 +67,14 @@ builder.Services.AddScoped<TelegramBotService>();
 WebApplication app = builder.Build();
 
 // ========================
-// 8️⃣ Middleware
+// 8️. Middleware
 // ========================
 
 // Enable Swagger UI only in development environment
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    _ = app.UseSwagger();
+    _ = app.UseSwaggerUI();
 }
 
 // Enable HTTPS redirection
@@ -87,6 +87,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ========================
-// 9️⃣ Run the app
+// 9️. Run the app
 // ========================
 app.Run();
