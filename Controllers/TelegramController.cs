@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Nastaran_bot.Controllers
+namespace Nastaran_bot.Controllers;
+
+public class TelegramController : ControllerBase
 {
-    public class TelegramController : ControllerBase
-    {
-    }
 }

@@ -1,6 +1,5 @@
-﻿namespace Nastaran_bot.Services
+﻿namespace Nastaran_bot.Services;
+
+public class UserService
 {
-    public class UserService
-    {
-    }
 }

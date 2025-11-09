@@ -1,8 +1,7 @@
 ﻿using Nastaran_bot.Models;
 
-namespace Nastaran_bot.Repositories.DailyNote
+namespace Nastaran_bot.Repositories.DailyNote;
+
+public interface IDailyNoteRepository : IRepository<DailyNotes>
 {
-    public interface IDailyNoteRepository : IRepository<DailyNotes>
-    {
-    }
 }
