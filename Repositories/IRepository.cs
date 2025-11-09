@@ -4,10 +4,10 @@ namespace Nastaran_bot.Repositories;
 
 public interface IRepository<T> where T : class
 {
-    Task<T> GetByIdAsync(string id);
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter); 
-    Task CreateAsync(T entity);
-    Task UpdateAsync(T entity);
-    Task DeleteAsync(string id);
+    public Task<T> GetByIdAsync(string id);
+    public Task<IEnumerable<T>> GetAllAsync();
+    public Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter);
+    public Task CreateAsync(T entity);
+    public Task UpdateAsync(T entity);
+    public Task DeleteAsync(string id);
 }
