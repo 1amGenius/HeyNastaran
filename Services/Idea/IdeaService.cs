@@ -1,5 +1,8 @@
-﻿namespace Nastaran_bot.Services.Idea;
+﻿using Nastaran_bot.Repositories.Idea;
 
-public class IdeaService : IIdeaService
+namespace Nastaran_bot.Services.Idea;
+
+public class IdeaService(IIdeaRepository ideaRepository) : IIdeaService
 {
+    private readonly IIdeaRepository _ideaRepository = ideaRepository;
 }

@@ -1,5 +1,8 @@
-﻿namespace Nastaran_bot.Services.Inspiration;
+﻿using Nastaran_bot.Repositories.Inspiration;
 
-public class InspirationService : IInspirationService
+namespace Nastaran_bot.Services.Inspiration;
+
+public class InspirationService(IInspirationRepository inspirationRepository) : IInspirationService
 {
+    private readonly IInspirationRepository _inspirationRepository = inspirationRepository;
 }
