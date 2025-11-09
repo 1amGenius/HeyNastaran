@@ -77,8 +77,19 @@ if (app.Environment.IsDevelopment())
     _ = app.UseSwaggerUI();
 }
 
-// Enable HTTPS redirection
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    // Enable HSTS for production
+    _ = app.UseHsts();
+    // Enable HTTPS redirection for production
+    _ = app.UseHttpsRedirection();
+}
+
+// Configure the app to listen on all network interfaces at port 8080
+app.Urls.Add("http://0.0.0.0:8080");
+
+// Enable Authentication middleware (if you add authentication later)
+app.UseAuthentication();
 
 // Enable Authorization middleware (if you add policies later)
 app.UseAuthorization();
