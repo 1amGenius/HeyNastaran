@@ -82,27 +82,24 @@ The backend is designed with **clean architecture principles**, **dependency inj
 
 The architecture follows **clean, layered design**:
 
+```
 Controller (TelegramController)
-
-▼
-
+		|
+		▼
 TelegramBotService (orchestrator)
-
-▼
-
+		|
+		▼
 Domain Services
 (UserService, DailyNoteService, IdeaService, InspirationService)
-
-▼
-
+		|
+		▼
 Repositories
 (UserRepository, DailyNoteRepository, IdeaRepository, InspirationRepository)
-
-▼
-
+		|
+		▼
 MongoDB (collections)
 (Users, DailyNotes, Ideas, Inspirations)
-
+```
 
 **Dependency Injection** is used throughout:
 
