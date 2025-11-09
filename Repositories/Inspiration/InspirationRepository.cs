@@ -1,11 +1,21 @@
 ﻿using System.Linq.Expressions;
 
+using MongoDB.Driver;
+
 using Nastaran_bot.Models;
 
 namespace Nastaran_bot.Repositories.Inspiration;
 
 public class InspirationRepository : IInspirationRepository
 {
+    private readonly IMongoCollection<Inspirations> _inspirations;
+
+    public InspirationRepository(IMongoClient client)
+    {
+        IMongoDatabase database = client.GetDatabase("nastaranBotDb");
+        _inspirations = database.GetCollection<Inspirations>("inspirations");
+    }
+
     public Task CreateAsync(Inspirations entity) => throw new NotImplementedException();
 
     public Task DeleteAsync(string id) => throw new NotImplementedException();
