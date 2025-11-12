@@ -15,7 +15,7 @@ A personal Telegram bot for **Nastaran**, my best friend. Providing utility feat
 7. [Folder Structure](#-folder-structure)  
 8. [Future Roadmap](#-future-roadmap)  
 9. [Contributing](#-contributing--i-dont-know-why-but-thanks-anyways-)  
-10. [License](#license)  
+10. [License](#-license)  
 
 ---
 
@@ -238,3 +238,17 @@ appsettings.Development.json (ignored)
 3. Commit your changes (`git commit -am 'Add feature'`)
 4. Push to the branch (`git push origin feature/my-feature`)
 5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE) — see the [LICENSE](LICENSE) file for details.
+
+The MIT License is a permissive open-source license that allows you to:
+
+- Use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the project.
+- Include this project in your own projects, even commercially.
+
+⚠️ **Disclaimer:** The software is provided "as-is", without warranty of any kind. Use it at your own risk.
+
