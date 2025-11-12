@@ -1,30 +1,72 @@
 ﻿using System.Linq.Expressions;
 
 using MongoDB.Driver;
-
-using Nastaran_bot.Models;
+using MongoDB.Driver.Linq;
 
 namespace Nastaran_bot.Repositories.DailyNote;
 
 public class DailyNoteRepository : IDailyNoteRepository
 {
-    private readonly IMongoCollection<DailyNotes> _dailyNotes;
+    private readonly IMongoCollection<Models.DailyNote> _dailyNotes;
 
     public DailyNoteRepository(IMongoClient client)
     {
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
-        _dailyNotes = database.GetCollection<DailyNotes>("dailyNotes");
+        _dailyNotes = database.GetCollection<Models.DailyNote>("dailyNotes");
     }
 
-    public Task CreateAsync(DailyNotes entity) => throw new NotImplementedException();
+    public async Task CreateAsync(Models.DailyNote entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
 
-    public Task DeleteAsync(string id) => throw new NotImplementedException();
+        await _dailyNotes.InsertOneAsync(entity);
+    }
 
-    public Task<IEnumerable<DailyNotes>> FindAsync(Expression<Func<DailyNotes, bool>> filter) => throw new NotImplementedException();
+    public async Task<bool> DeleteAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return false;
+        }
 
-    public Task<IEnumerable<DailyNotes>> GetAllAsync() => throw new NotImplementedException();
+        DeleteResult result = await _dailyNotes.DeleteOneAsync(n => n.Id == id);
+        return result.DeletedCount > 0;
+    }
 
-    public Task<DailyNotes> GetByIdAsync(string id) => throw new NotImplementedException();
+    public async Task<IEnumerable<Models.DailyNote>> FindAsync(Expression<Func<Models.DailyNote, bool>> filter)
+    {
+        ArgumentNullException.ThrowIfNull(nameof(filter));
+        return await _dailyNotes.AsQueryable().Where(filter).ToListAsync();
+    }
 
-    public Task UpdateAsync(DailyNotes entity) => throw new NotImplementedException();
+    public async Task<IEnumerable<Models.DailyNote>> GetAllAsync() 
+        => await _dailyNotes.Find(_ => true).ToListAsync();
+
+    public async Task<Models.DailyNote> GetByIdAsync(string id) 
+    {
+        FilterDefinition<Models.DailyNote> filter = Builders<Models.DailyNote>.Filter.Eq(n => n.Id, id);
+        return await _dailyNotes.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<Models.DailyNote>> GetByTelegramIdAsync(long telegramId)
+    {
+        FilterDefinition<Models.DailyNote> filter = Builders<Models.DailyNote>.Filter.Eq("telegramId", telegramId);
+        return await _dailyNotes.Find(filter).ToListAsync();
+    }
+
+    public async Task UpdateAsync(Models.DailyNote entity)
+    {
+        ArgumentNullException.ThrowIfNull(nameof(entity));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
+
+        entity.UpdatedAt = DateTime.UtcNow;
+
+        FilterDefinition<Models.DailyNote> filter = Builders<Models.DailyNote>.Filter.Eq(n => n.Id, entity.Id);
+        ReplaceOneResult result = await _dailyNotes.ReplaceOneAsync(filter, entity);
+
+        if (result.MatchedCount == 0)
+        {
+            throw new InvalidOperationException($"DailyNote with Id {entity.Id} was not found.");
+        }
+    }
 }
