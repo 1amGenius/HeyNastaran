@@ -9,5 +9,5 @@ public interface IRepository<T> where T : class
     public Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter);
     public Task CreateAsync(T entity);
     public Task UpdateAsync(T entity);
-    public Task DeleteAsync(string id);
+    public Task<bool> DeleteAsync(string id);
 }
