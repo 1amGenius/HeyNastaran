@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Nastaran_bot.Models;
 
-public class DailyNote
+public class Inspiration
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -20,52 +20,52 @@ public class DailyNote
         set;
     }
 
-    [BsonElement("date")]
-    public string Date 
+    [BsonElement("label")]
+    public string Label 
+    {
+        get;
+        set;
+    } = string.Empty; 
+
+    [BsonElement("imageFileId")]
+    public string ImageFileId 
     { 
         get;
         set;
     } = string.Empty;
 
-    [BsonElement("text")]
-    public string Text 
-    {
-        get;
-        set; 
-    } = string.Empty;
-
-    [BsonElement("category")]
-    public string Category 
-    {
-        get;
-        set;
-    } = string.Empty;
-
-    [BsonElement("author")]
-    public string Author 
-    {
+    [BsonElement("caption")]
+    public string Caption 
+    { 
         get; 
         set;
-    } = "unknown";
+    } = string.Empty;
 
-    [BsonElement("usedAt")]
-    [BsonIgnoreIfNull]
-    public DateTime? UsedAt
-    {
-        get; set;
-    }
+    [BsonElement("tags")]
+    public List<string> Tags 
+    { 
+        get;
+        set;
+    } = [];
 
     [BsonElement("createdAt")]
     public DateTime CreatedAt 
-    {
-        get;
+    { 
+        get; 
         set;
     } = DateTime.UtcNow;
 
     [BsonElement("updatedAt")]
     public DateTime UpdatedAt 
+    { 
+        get;
+        set; 
+    } = DateTime.UtcNow;
+
+    [BsonElement("favorite")]
+    public bool Favorite 
     {
         get;
         set;
-    } = DateTime.UtcNow;
+    } = false;
 }

@@ -16,7 +16,8 @@ public class Idea
     [BsonElement("telegramId")]
     public long TelegramId
     {
-        get; set;
+        get;
+        set;
     }
 
     [BsonElement("label")]
@@ -24,7 +25,7 @@ public class Idea
     {
         get;
         set;
-    } = "song_idea";
+    } = string.Empty;
 
     [BsonElement("content")]
     public string Content 
