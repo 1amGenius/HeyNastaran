@@ -8,7 +8,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
     private readonly IDailyNoteRepository _dailyNoteRepository = dailyNoteRepository;
     private readonly ILogger<DailyNoteService> _logger = logger;
 
-    public async Task<Models.DailyNote> AddDailyNoteAsync(long telegramId, string text, string category = "general", string author = "unknown")
+    public async Task<Models.DailyNote> AddNoteAsync(long telegramId, string text, string category = "general", string author = "unknown")
     {
         try
         {
