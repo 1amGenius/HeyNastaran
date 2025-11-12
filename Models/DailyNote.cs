@@ -13,6 +13,12 @@ public class DailyNote
         set;
     } = string.Empty;
 
+    [BsonElement("telegramId")]
+    public long TelegramId
+    {
+        get; set;
+    }
+
     [BsonElement("date")]
     public string Date 
     { 
