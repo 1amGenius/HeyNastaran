@@ -6,15 +6,15 @@ A personal Telegram bot for **Nastaran**, my best friend. Providing utility feat
 
 ## 📋 Table of Contents
 
-1. [Project Overview](#project-overview)  
-2. [Features](#features)  
-3. [Tech Stack](#tech-stack)  
-4. [Architecture](#architecture)  
-5. [Setup & Installation](#setup--installation)  
-6. [Configuration](#configuration)  
-7. [Folder Structure](#folder-structure)  
-8. [Future Roadmap](#future-roadmap)  
-9. [Contributing](#contributing)  
+1. [Project Overview](#-project-overview)  
+2. [Features](#-features)  
+3. [Tech Stack](#-tech-stack)  
+4. [Architecture](#-architecture)  
+5. [Setup & Installation](#%EF%B8%8F-setup--installation)  
+6. [Configuration](#-configuration)  
+7. [Folder Structure](#-folder-structure)  
+8. [Future Roadmap](#-future-roadmap)  
+9. [Contributing](#-contributing--i-dont-know-why-but-thanks-anyways-)  
 10. [License](#license)  
 
 ---
