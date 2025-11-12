@@ -10,6 +10,8 @@ using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
 using Nastaran_bot.Services.User;
 
+using Telegram.Bot;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // ========================
@@ -37,7 +39,20 @@ builder.Services.AddSingleton<IMongoClient>(s =>
     new MongoClient(builder.Configuration.GetConnectionString("MongoDb")));
 
 // ========================
-// 4️. Repositories DI
+// 4. TelegramBot Client
+// ========================
+// Register a single TelegramBotClient as a singleton.
+// It will be shared across all services.
+// Ensure you have the bot token in appsettings.Development.json
+builder.Services.AddSingleton<ITelegramBotClient>(sp =>
+{
+    IConfiguration config = sp.GetRequiredService<IConfiguration>();
+    string token = config["Telegram:BotToken"];
+    return new TelegramBotClient(token);
+});
+
+// ========================
+// 5. Repositories DI
 // ========================
 // Add Scoped repositories for dependency injection.
 // Each repository gets IMongoClient injected automatically.
@@ -47,7 +62,7 @@ builder.Services.AddScoped<IIdeaRepository, IdeaRepository>();
 builder.Services.AddScoped<IInspirationRepository, InspirationRepository>();
 
 // ========================
-// 5️. Services DI
+// 6. Services DI
 // ========================
 // Add Scoped services. They will use the repositories internally.
 builder.Services.AddScoped<IUserService, UserService>();
@@ -56,18 +71,18 @@ builder.Services.AddScoped<IIdeaService, IdeaService>();
 builder.Services.AddScoped<IInspirationService, InspirationService>();
 
 // ========================
-// 6️. TelegramBotService DI
+// 7. TelegramBotService DI
 // ========================
 // The orchestrator that handles updates, calling other services.
 builder.Services.AddScoped<TelegramBotService>();
 
 // ========================
-// 7️. Build the app
+// 8. Build the app
 // ========================
 WebApplication app = builder.Build();
 
 // ========================
-// 8️. Middleware
+// 9. Middleware
 // ========================
 
 // Enable Swagger UI only in development environment
