@@ -1,30 +1,72 @@
 ﻿using System.Linq.Expressions;
 
 using MongoDB.Driver;
-
-using Nastaran_bot.Models;
+using MongoDB.Driver.Linq;
 
 namespace Nastaran_bot.Repositories.Inspiration;
 
 public class InspirationRepository : IInspirationRepository
 {
-    private readonly IMongoCollection<Inspirations> _inspirations;
+    private readonly IMongoCollection<Models.Inspiration> _inspirations;
 
     public InspirationRepository(IMongoClient client)
     {
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
-        _inspirations = database.GetCollection<Inspirations>("inspirations");
+        _inspirations = database.GetCollection<Models.Inspiration>("inspirations");
     }
 
-    public Task CreateAsync(Inspirations entity) => throw new NotImplementedException();
+    public async Task CreateAsync(Models.Inspiration entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
 
-    public Task DeleteAsync(string id) => throw new NotImplementedException();
+        await _inspirations.InsertOneAsync(entity);
+    }
 
-    public Task<IEnumerable<Inspirations>> FindAsync(Expression<Func<Inspirations, bool>> filter) => throw new NotImplementedException();
+    public async Task<bool> DeleteAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return false;
+        }
 
-    public Task<IEnumerable<Inspirations>> GetAllAsync() => throw new NotImplementedException();
+        DeleteResult result = await _inspirations.DeleteOneAsync(n => n.Id == id);
+        return result.DeletedCount > 0;
+    }
 
-    public Task<Inspirations> GetByIdAsync(string id) => throw new NotImplementedException();
+    public async Task<IEnumerable<Models.Inspiration>> FindAsync(Expression<Func<Models.Inspiration, bool>> filter)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
+        return await _inspirations.AsQueryable().Where(filter).ToListAsync();
+    }
 
-    public Task UpdateAsync(Inspirations entity) => throw new NotImplementedException();
+    public async Task<IEnumerable<Models.Inspiration>> GetAllAsync()
+        => await _inspirations.Find(_ => true).ToListAsync();
+
+    public async Task<Models.Inspiration> GetByIdAsync(string id)
+    {
+        FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(n => n.Id, id);
+        return await _inspirations.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<Models.Inspiration>> GetByTelegramIdAsync(long telegramId)
+    {
+        FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq("telegramId", telegramId);
+        return await _inspirations.Find(filter).ToListAsync();
+    }
+
+    public async Task UpdateAsync(Models.Inspiration entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
+
+        entity.UpdatedAt = DateTime.UtcNow;
+
+        FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(n => n.Id, entity.Id);
+        ReplaceOneResult result = await _inspirations.ReplaceOneAsync(filter, entity);
+
+        if (result.MatchedCount == 0)
+        {
+            throw new InvalidOperationException($"Inspiration with Id {entity.Id} was not found.");
+        }
+    }
 }
