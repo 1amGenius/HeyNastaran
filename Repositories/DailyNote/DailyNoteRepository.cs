@@ -35,7 +35,7 @@ public class DailyNoteRepository : IDailyNoteRepository
 
     public async Task<IEnumerable<Models.DailyNote>> FindAsync(Expression<Func<Models.DailyNote, bool>> filter)
     {
-        ArgumentNullException.ThrowIfNull(nameof(filter));
+        ArgumentNullException.ThrowIfNull(filter);
         return await _dailyNotes.AsQueryable().Where(filter).ToListAsync();
     }
 
@@ -56,7 +56,7 @@ public class DailyNoteRepository : IDailyNoteRepository
 
     public async Task UpdateAsync(Models.DailyNote entity)
     {
-        ArgumentNullException.ThrowIfNull(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
         ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
 
         entity.UpdatedAt = DateTime.UtcNow;
