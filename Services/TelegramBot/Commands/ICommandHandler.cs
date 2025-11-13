@@ -1,5 +1,14 @@
-﻿namespace Nastaran_bot.Services.TelegramBot.Commands;
+﻿using Telegram.Bot.Types;
 
-public class ICommandHandler
+namespace Nastaran_bot.Services.TelegramBot.Commands;
+
+public interface ICommandHandler
 {
+    public string Command
+    {
+        get;
+    }
+
+    public Task HandleAsync(Update update);
 }
+
