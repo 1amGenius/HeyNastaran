@@ -8,6 +8,7 @@ using Nastaran_bot.Services.DailyNote;
 using Nastaran_bot.Services.Idea;
 using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
+using Nastaran_bot.Services.TelegramBot.Commands;
 using Nastaran_bot.Services.User;
 
 using Telegram.Bot;
@@ -69,6 +70,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDailyNoteService, DailyNoteService>();
 builder.Services.AddScoped<IIdeaService, IdeaService>();
 builder.Services.AddScoped<IInspirationService, InspirationService>();
+
+builder.Services.AddScoped<ICommandHandler, NoteCommandHandler>();
+builder.Services.AddScoped<ICommandHandler, IdeaCommandHandler>();
+builder.Services.AddScoped<ICommandHandler, InspirationCommandHandler>();
+builder.Services.AddScoped<ICommandHandler, WeatherCommandHandler>();
+builder.Services.AddScoped<CommandRouter>();
 
 // ========================
 // 7. TelegramBotService DI
