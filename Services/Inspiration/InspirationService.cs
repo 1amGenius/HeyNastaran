@@ -20,7 +20,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
             var newInspiration = new Models.Inspiration
             {
                 TelegramId = telegramId,
-                Caption = caption,
+                Content = caption,
                 Favorite = favorite,
                 ImageFileId = imageFileId,
                 Label = label ?? string.Empty,

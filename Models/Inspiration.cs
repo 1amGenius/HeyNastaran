@@ -34,8 +34,8 @@ public class Inspiration
         set;
     } = string.Empty;
 
-    [BsonElement("caption")]
-    public string Caption 
+    [BsonElement("content")]
+    public string Content 
     { 
         get; 
         set;
