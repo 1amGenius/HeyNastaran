@@ -174,47 +174,71 @@ MongoDB (collections)
 
 ```
 /Controllers
-    TelegramController.cs
+|   TelegramController.cs
 
 /Models
-    User.cs
-    DailyNote.cs
-    Idea.cs
-    Inspiration.cs
+|   User.cs
+|   DailyNote.cs
+|   Idea.cs
+|   Inspiration.cs
 
 /Repositories
-    /User
-        IUserRepository.cs
-        UserRepository.cs
-    /DailyNote
-        IDailyNoteRepository.cs
-        DailyNoteRepository.cs
-    /Idea
-        IIdeaRepository.cs
-        IdeaRepository.cs
-    /Inspiration
-        IInspirationRepository.cs
-        InspirationRepository.cs
+|   /User
+|   |    IUserRepository.cs
+|   |    UserRepository.cs
+|
+|   /DailyNote
+|   |    IDailyNoteRepository.cs
+|   |    DailyNoteRepository.cs
+|
+|   /Idea
+|   |    IIdeaRepository.cs
+|   |    IdeaRepository.cs
+|
+|   /Inspiration
+|   |    IInspirationRepository.cs
+|   |    InspirationRepository.cs
 
 /Services
-    /User
-        IUserService.cs
-        UserService.cs
-    /DailyNote
-        IDailyNoteService.cs
-        DailyNoteService.cs
-    /Idea
-        IIdeaService.cs
-        IdeaService.cs
-    /Inspiration
-        IInspirationService.cs
-        InspirationService.cs
-    /TelegramBot
-        TelegramBotService.cs
+|   /User
+|   |   IUserService.cs
+|   |   UserService.cs
+|
+|   /DailyNote
+|   |   IDailyNoteService.cs
+|   |   DailyNoteService.cs
+|
+|   /Idea
+|   |   IIdeaService.cs
+|   |   IdeaService.cs
+|
+|   /Inspiration
+|   |   IInspirationService.cs
+|   |   InspirationService.cs
+|
+|   /TelegramBot
+|	|	/Commands
+|	|	|	CommandRouter.cs
+|	|	|	ICommandHandler.cs
+|	|	|	IdeaCommandHandler.cs
+|	|	|	InspirationCommandHandler.cs
+|	|	|	NoteCommandHandler.cs
+|	|	|	WeatherCommandHandler.cs
+|	|
+|   |   TelegramBotService.cs
+
+/Utils
+|	/Helpers
+|	|	MusicApiClient.cs
+|	|	Scheduler.cs
+|	|	WeatherApiClient.cs
+|
+|	CodeUtility.cs
 
 Program.cs
 appsettings.json
 appsettings.Development.json (ignored)
+Dockerfile
 ```
 
 ---
