@@ -37,7 +37,7 @@ public class TelegramBotService(
         long chatId = update.Message.Chat.Id;
         string messageText = update.Message.Text;
 
-        if (!string.IsNullOrWhiteSpace(messageText) && messageText.StartsWith("/"))
+        if (!string.IsNullOrWhiteSpace(messageText) && messageText.StartsWith(char.Parse("/")))
         {
             await _commandRouter.RouteAsync(update);
         }

@@ -1,5 +1,4 @@
-﻿using Nastaran_bot.Models;
-using Nastaran_bot.Repositories.DailyNote;
+﻿using Nastaran_bot.Repositories.DailyNote;
 
 namespace Nastaran_bot.Services.DailyNote;
 
@@ -8,7 +7,11 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
     private readonly IDailyNoteRepository _dailyNoteRepository = dailyNoteRepository;
     private readonly ILogger<DailyNoteService> _logger = logger;
 
-    public async Task<Models.DailyNote> AddNoteAsync(long telegramId, string text, string category = "general", string author = "unknown")
+    public async Task<Models.DailyNote> AddNoteAsync(
+        long telegramId,
+        string text,
+        string category = "general",
+        string author = "unknown")
     {
         try
         {
@@ -29,7 +32,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error adding daily note for TelegramId {telegramId}", telegramId);
+            _logger.LogError(ex, "Error adding daily note for TelegramId {telegramId}", telegramId);
             throw;
         }
     }
@@ -42,7 +45,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error fetching notes for TelegramId {telegramId}", telegramId);
+            _logger.LogError(ex, "Error fetching notes for TelegramId {telegramId}", telegramId);
             return [];
         }
     }
@@ -55,7 +58,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error deleting note {id}", id);
+            _logger.LogError(ex, "Error deleting note {id}", id);
             return false;
         }
     }
@@ -68,7 +71,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error getting note {id}", id);
+            _logger.LogError(ex, "Error getting note {id}", id);
             return null;
         }
     }

@@ -1,5 +1,4 @@
-﻿
-using Nastaran_bot.Services.Inspiration;
+﻿using Nastaran_bot.Services.Inspiration;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;

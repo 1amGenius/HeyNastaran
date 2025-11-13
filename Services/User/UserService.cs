@@ -1,5 +1,4 @@
-﻿using Nastaran_bot.Models;
-using Nastaran_bot.Repositories.User;
+﻿using Nastaran_bot.Repositories.User;
 
 namespace Nastaran_bot.Services.User;
 

@@ -3,8 +3,6 @@
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
-using Nastaran_bot.Models;
-
 namespace Nastaran_bot.Repositories.User;
 
 public class UserRepository : IUserRepository

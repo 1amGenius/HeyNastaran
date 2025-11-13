@@ -34,7 +34,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error adding inspiration for TelegramId {telegramId}", telegramId);
+            _logger.LogError(ex, "Error adding inspiration for TelegramId {telegramId}", telegramId);
             throw;
         }
     }
@@ -47,7 +47,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error fetching inspirations for TelegramId {telegramId}", telegramId);
+            _logger.LogError(ex, "Error fetching inspirations for TelegramId {telegramId}", telegramId);
             return [];
         }
     }
@@ -60,7 +60,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error deleting inspiration {id}", id);
+            _logger.LogError(ex, "Error deleting inspiration {id}", id);
             return false;
         }
     }
@@ -73,7 +73,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error getting inspiration {id}", id);
+            _logger.LogError(ex, "Error getting inspiration {id}", id);
             return null;
         }
     }
