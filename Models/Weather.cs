@@ -159,6 +159,12 @@ public class HourlyForecast
         get; 
         set;
     } = "🌤";
+
+    public double UvIndex
+    {
+        get;
+        set;
+    }
 }
 
 public class DailyForecast
