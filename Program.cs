@@ -11,6 +11,8 @@ using Nastaran_bot.Services.TelegramBot;
 using Nastaran_bot.Services.TelegramBot.Commands;
 using Nastaran_bot.Services.User;
 
+using OpenMeteo;
+
 using Telegram.Bot;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -53,7 +55,14 @@ builder.Services.AddSingleton<ITelegramBotClient>(sp =>
 });
 
 // ========================
-// 5. Repositories DI
+// 5. Weather Api Client
+// ========================
+// Register a single OpenMeteoClient as a singleton.
+// It will be (mostly) used in all of our functions in Utils/Helpers/WeatherApiClient.
+builder.Services.AddSingleton<OpenMeteoClient>();
+
+// ========================
+// 6. Repositories DI
 // ========================
 // Add Scoped repositories for dependency injection.
 // Each repository gets IMongoClient injected automatically.
@@ -63,7 +72,7 @@ builder.Services.AddScoped<IIdeaRepository, IdeaRepository>();
 builder.Services.AddScoped<IInspirationRepository, InspirationRepository>();
 
 // ========================
-// 6. Services DI
+// 7. Services DI
 // ========================
 // Add Scoped services. They will use the repositories internally.
 builder.Services.AddScoped<IUserService, UserService>();
@@ -78,19 +87,20 @@ builder.Services.AddScoped<ICommandHandler, WeatherCommandHandler>();
 builder.Services.AddScoped<CommandRouter>();
 
 // ========================
-// 7. TelegramBotService DI
+// 8. TelegramBotService DI
 // ========================
 // The orchestrator that handles updates, calling other services.
 builder.Services.AddScoped<TelegramBotService>();
 
 // ========================
-// 8. Build the app
+// 9. Build the app
 // ========================
 WebApplication app = builder.Build();
 
 // ========================
-// 9. Middleware
+// 10. Middleware
 // ========================
+// -----------  Nothing yet  -----------
 
 // Enable Swagger UI only in development environment
 if (app.Environment.IsDevelopment())
@@ -110,16 +120,16 @@ if (!app.Environment.IsDevelopment())
 // Configure the app to listen on all network interfaces at port 8080
 app.Urls.Add("http://0.0.0.0:8080");
 
-// Enable Authentication middleware (if you add authentication later)
+// Enable Authentication middleware (if authentication is added later)
 app.UseAuthentication();
 
-// Enable Authorization middleware (if you add policies later)
+// Enable Authorization middleware (if policies is added later)
 app.UseAuthorization();
 
 // Map controller endpoints (e.g., Telegram webhook)
 app.MapControllers();
 
 // ========================
-// 9️. Run the app
+// 11. Run the app
 // ========================
 app.Run();
