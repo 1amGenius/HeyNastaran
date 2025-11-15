@@ -10,6 +10,9 @@ using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
 using Nastaran_bot.Services.TelegramBot.Commands;
 using Nastaran_bot.Services.User;
+using Nastaran_bot.Utils.Helpers.Music;
+using Nastaran_bot.Utils.Helpers.Scheduler;
+using Nastaran_bot.Utils.Helpers.Weather;
 
 using OpenMeteo;
 
@@ -93,12 +96,19 @@ builder.Services.AddScoped<CommandRouter>();
 builder.Services.AddScoped<TelegramBotService>();
 
 // ========================
-// 9. Build the app
+// 9. Helpers DI
+// ========================
+builder.Services.AddSingleton<IWeatherApiClient, WeatherApiClient>();
+builder.Services.AddSingleton<IMusicApiClient, MusicApiClient>();
+builder.Services.AddSingleton<IScheduler, Scheduler>();
+
+// ========================
+// 10. Build the app
 // ========================
 WebApplication app = builder.Build();
 
 // ========================
-// 10. Middleware
+// 11. Middleware
 // ========================
 // -----------  Nothing yet  -----------
 
@@ -130,6 +140,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ========================
-// 11. Run the app
+// 12. Run the app
 // ========================
 app.Run();
