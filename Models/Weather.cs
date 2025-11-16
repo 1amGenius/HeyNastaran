@@ -2,13 +2,13 @@
 
 public class Weather
 {
-    public double Latitude
+    public float Latitude
     {
         get;
         set;
     }
 
-    public double Longitude
+    public float Longitude
     {
         get;
         set;
@@ -49,25 +49,25 @@ public class Weather
 
 public class CurrentWeather
 {
-    public double TemperatureC
+    public float TemperatureC
     {
         get;
         set;
     }
 
-    public double FeelsLikeC
+    public float FeelsLikeC
     {
         get;
         set;
     }
 
-    public double WindSpeedKph
+    public float WindSpeedKph
     {
         get;
         set;
     }
 
-    public double Humidity
+    public float Humidity
     {
         get;
         set;
@@ -85,19 +85,19 @@ public class CurrentWeather
         set;
     } = "🌤";
     
-    public double? UvIndex
+    public float? UvIndex
     {
         get;
         set;
     }
 
-    public double? RainChance
+    public float? RainChance
     {
         get;
         set;
     }
     
-    public double? CloudCover
+    public float? CloudCover
     {
         get;
         set;
@@ -112,37 +112,37 @@ public class HourlyForecast
         set;
     }
 
-    public double TemperatureC
+    public float TemperatureC
     {
         get;
         set;
     }
 
-    public double FeelsLikeC
+    public float FeelsLikeC
     {
         get;
         set;
     }
 
-    public double WindSpeedKph
+    public float WindSpeedKph
     {
         get; 
         set;
     }
 
-    public double Humidity
+    public float Humidity
     {
         get;
         set;
     }
 
-    public double? RainChance
+    public float? RainChance
     {
         get;
         set;
     }
 
-    public double? CloudCover
+    public float? CloudCover
     {
         get;
         set;
@@ -160,7 +160,7 @@ public class HourlyForecast
         set;
     } = "🌤";
 
-    public double UvIndex
+    public float UvIndex
     {
         get;
         set;
@@ -175,13 +175,13 @@ public class DailyForecast
         set;
     }
 
-    public double TemperatureMinC
+    public float TemperatureMinC
     {
         get; 
         set;
     }
 
-    public double TemperatureMaxC
+    public float TemperatureMaxC
     {
         get;
         set;
@@ -199,19 +199,19 @@ public class DailyForecast
         set;
     }
 
-    public double? RainChance
+    public float? RainChance
     {
         get;
         set;
     }
 
-    public double? UvIndex
+    public float? UvIndex
     {
         get;
         set;
     }
 
-    public double? CloudCover
+    public float? CloudCover
     {
         get;
         set;
