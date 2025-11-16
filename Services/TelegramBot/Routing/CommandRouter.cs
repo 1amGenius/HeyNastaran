@@ -5,39 +5,30 @@ using Telegram.Bot.Types;
 
 namespace Nastaran_bot.Services.TelegramBot.Routing;
 
-public class CommandRouter(IEnumerable<ICommandHandler> commandHandlers, ITelegramBotClient botClient)
+public class CommandRouter(IEnumerable<ICommandHandler> commandHandlers)
 {
     private readonly IEnumerable<ICommandHandler> _commandHandlers = commandHandlers;
-    private readonly ITelegramBotClient _botClient = botClient;
 
-    public async Task RouteAsync(Update update)
+    public async Task<bool> RouteAsync(Update update)
     {
-        if (update.Message == null || string.IsNullOrWhiteSpace(update.Message.Text))
+        string text = update.Message?.Text;
+        if (string.IsNullOrWhiteSpace(text))
         {
-            return;
+            return false; // not a command
         }
 
-        long chatId = update.Message.Chat.Id;
-        string messageText = update.Message.Text.Trim();
-
-        string[] parts = messageText
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        
+        string[] parts = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         string command = parts[0].ToLower();
 
         ICommandHandler handler = _commandHandlers
-            .FirstOrDefault(h => h.Command
-            .Equals(command, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(h => h.Command.Equals(command, StringComparison.OrdinalIgnoreCase));
 
-        if (handler != null)
+        if (handler == null)
         {
-            await handler
-                .HandleAsync(update);
+            return false;
         }
-        else
-        {
-            _ = await _botClient
-                .SendMessage(chatId, "Sorry, I don’t recognize that command 😅");
-        }
+
+        await handler.HandleAsync(update);
+        return true;
     }
 }
