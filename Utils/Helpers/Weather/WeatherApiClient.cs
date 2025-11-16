@@ -15,7 +15,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // GET LANGITUDE AND LONGITUDE FROM CITY NAME
     // ========================
-    public async Task<(double Latitude, double Longitude)> GetCoordinatesByCityNameAsync(string cityName)
+    public async Task<(float Latitude, float Longitude)> GetCoordinatesByCityNameAsync(string cityName)
     {
         try
         {
@@ -39,12 +39,11 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // CURRENT WEATHER
     // ========================
-    public async Task<Models.Weather> GetCurrentWeatherAsync(double latitude, double longitude)
+    public async Task<Models.Weather> GetCurrentWeatherAsync(string cityName)
     {
         try
         {
-            WeatherForecast result = await _client.QueryWeatherApiAsync((float) latitude, (float) longitude);
-
+            WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
             if (result?.Current == null)
             {
                 throw new Exception("Weather API returned null current weather.");
@@ -53,12 +52,12 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
             WeatherData mappedCurrent = WeatherMapper.MapCurrentWeather(result.Current);
 
             // Fetch UV index via air quality API
-            double uvIndex = await FetchCurrentUvIndex(latitude, longitude);
+            float uvIndex = await FetchCurrentUvIndex(result.Latitude, result.Longitude);
 
             return new Models.Weather
             {
-                Latitude = latitude,
-                Longitude = longitude,
+                Latitude = result.Latitude,
+                Longitude = result.Longitude,
                 Timezone = result.Timezone ?? "UTC",
                 Current = new Models.CurrentWeather
                 {
@@ -76,7 +75,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching current weather for lat={Lat}, lon={Lon}", latitude, longitude);
+            _logger.LogError(ex, "Error fetching current weather for city {cityName}", cityName);
             throw;
         }
     }
@@ -84,11 +83,11 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // HOURLY FORECAST
     // ========================
-    public async Task<Models.Weather> GetHourlyForecastAsync(double latitude, double longitude, int hours = 24)
+    public async Task<Models.Weather> GetHourlyForecastAsync(string cityName, int hours = 24)
     {
         try
         {
-            WeatherForecast result = await _client.QueryWeatherApiAsync((float) latitude, (float) longitude);
+            WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
 
             if (result?.Hourly?.Time == null)
             {
@@ -97,8 +96,8 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
 
             var weather = new Models.Weather
             {
-                Latitude = latitude,
-                Longitude = longitude,
+                Latitude = result.Latitude,
+                Longitude = result.Longitude,
                 Timezone = result.Timezone ?? "UTC",
                 Hourly = []
             };
@@ -106,7 +105,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
             int count = Math.Min(hours, result.Hourly.Time.Length);
 
             // Fetch hourly UV index
-            float[] hourlyUv = await FetchHourlyUvIndex(latitude, longitude, count);
+            float[] hourlyUv = await FetchHourlyUvIndex(result.Latitude, result.Longitude, count);
 
             for (int i = 0; i < count; i++)
             {
@@ -138,7 +137,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching hourly forecast for lat={Lat}, lon={Lon}", latitude, longitude);
+            _logger.LogError(ex, "Error fetching hourly forecast for city {cityName}", cityName);
             throw;
         }
     }
@@ -146,11 +145,11 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // DAILY FORECAST
     // ========================
-    public async Task<Models.Weather> GetDailyForecastAsync(double latitude, double longitude, int days = 7)
+    public async Task<Models.Weather> GetDailyForecastAsync(string cityName, int days = 7)
     {
         try
         {
-            WeatherForecast result = await _client.QueryWeatherApiAsync((float) latitude, (float) longitude);
+            WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
 
             if (result?.Daily?.Time == null)
             {
@@ -159,8 +158,8 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
 
             var weather = new Models.Weather
             {
-                Latitude = latitude,
-                Longitude = longitude,
+                Latitude = result.Latitude,
+                Longitude = result.Longitude,
                 Timezone = result.Timezone ?? "UTC",
                 Daily = []
             };
@@ -209,7 +208,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching daily forecast for lat={Lat}, lon={Lon}", latitude, longitude);
+            _logger.LogError(ex, "Error fetching daily forecast for city {cityName}", cityName);
             throw;
         }
     }
@@ -217,11 +216,11 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // FULL WEATHER REPORT
     // ========================
-    public async Task<Models.Weather> GetFullWeatherReportAsync(double latitude, double longitude)
+    public async Task<Models.Weather> GetFullWeatherReportAsync(string cityName)
     {
-        Models.Weather current = await GetCurrentWeatherAsync(latitude, longitude);
-        Models.Weather hourly = await GetHourlyForecastAsync(latitude, longitude);
-        Models.Weather daily = await GetDailyForecastAsync(latitude, longitude);
+        Models.Weather current = await GetCurrentWeatherAsync(cityName);
+        Models.Weather hourly = await GetHourlyForecastAsync(cityName);
+        Models.Weather daily = await GetDailyForecastAsync(cityName);
 
         current.Hourly = hourly.Hourly;
         current.Daily = daily.Daily;
@@ -232,23 +231,23 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // UV INDEX ONLY
     // ========================
-    public async Task<double> GetUvIndexAsync(double latitude, double longitude) => await FetchCurrentUvIndex(latitude, longitude);
+    public async Task<float> GetUvIndexAsync(float latitude, float longitude) => await FetchCurrentUvIndex(latitude, longitude);
 
     // ========================
     // RAIN CHANCE ONLY
     // ========================
-    public async Task<double> GetRainChanceAsync(double latitude, double longitude)
+    public async Task<float> GetRainChanceAsync(string cityName)
     {
-        Models.Weather weather = await GetCurrentWeatherAsync(latitude, longitude);
+        Models.Weather weather = await GetCurrentWeatherAsync(cityName);
         return weather.Current.RainChance ?? 0f;
     }
 
     // ========================
     // MINIMAL WEATHER SUMMARY
     // ========================
-    public async Task<Models.Weather> GetMinimizedWeatherAsync(double latitude, double longitude)
+    public async Task<Models.Weather> GetMinimizedWeatherAsync(string cityName)
     {
-        Models.Weather current = await GetCurrentWeatherAsync(latitude, longitude);
+        Models.Weather current = await GetCurrentWeatherAsync(cityName);
 
         return new Models.Weather
         {
@@ -271,11 +270,11 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     // ========================
     // HELPERS FOR UV INDEX
     // ========================
-    private async Task<double> FetchCurrentUvIndex(double latitude, double longitude)
+    private async Task<float> FetchCurrentUvIndex(float latitude, float longitude)
     {
         try
         {
-            var options = new AirQualityOptions(latitude: (float) latitude, longitude: (float) longitude)
+            var options = new AirQualityOptions(latitude, longitude)
             {
                 Hourly = new AirQualityOptions.HourlyOptions(AirQualityOptions.HourlyOptionsParameter.uv_index)
             };
@@ -289,11 +288,11 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
     }
 
-    private async Task<float[]> FetchHourlyUvIndex(double latitude, double longitude, int hours)
+    private async Task<float[]> FetchHourlyUvIndex(float latitude, float longitude, int hours)
     {
         try
         {
-            var options = new AirQualityOptions(latitude: (float) latitude, longitude: (float) longitude)
+            var options = new AirQualityOptions(latitude, longitude)
             {
                 Hourly = new AirQualityOptions.HourlyOptions(AirQualityOptions.HourlyOptionsParameter.uv_index)
             };
