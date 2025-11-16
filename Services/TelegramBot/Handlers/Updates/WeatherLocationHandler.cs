@@ -31,8 +31,8 @@ public class WeatherLocationHandler(
             }
 
             long chatId = update.Message.Chat.Id;
-            double lat = update.Message.Location.Latitude;
-            double lon = update.Message.Location.Longitude;
+            float lat = (float) update.Message.Location.Latitude;
+            float lon = (float) update.Message.Location.Longitude;
 
             Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(lat, lon);
             Models.CurrentWeather cw = weather.Current;
