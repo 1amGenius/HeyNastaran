@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace Nastaran_bot.Services.TelegramBot.Commands;
+namespace Nastaran_bot.Services.TelegramBot.Handlers.Commands;
 
 public class CommandRouter(IEnumerable<ICommandHandler> commandHandlers, ITelegramBotClient botClient)
 {

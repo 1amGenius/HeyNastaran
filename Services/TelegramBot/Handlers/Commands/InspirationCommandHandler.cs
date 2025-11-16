@@ -4,7 +4,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Nastaran_bot.Services.TelegramBot.Commands;
+namespace Nastaran_bot.Services.TelegramBot.Handlers.Commands;
 
 public class InspirationCommandHandler(
     ITelegramBotClient botClient,

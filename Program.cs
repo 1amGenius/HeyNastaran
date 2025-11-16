@@ -8,7 +8,7 @@ using Nastaran_bot.Services.DailyNote;
 using Nastaran_bot.Services.Idea;
 using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
-using Nastaran_bot.Services.TelegramBot.Commands;
+using Nastaran_bot.Services.TelegramBot.Handlers.Commands;
 using Nastaran_bot.Services.User;
 using Nastaran_bot.Utils.Helpers.Music;
 using Nastaran_bot.Utils.Helpers.Scheduler;
