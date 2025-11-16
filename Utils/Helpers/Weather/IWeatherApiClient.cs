@@ -2,6 +2,8 @@
 
 public interface IWeatherApiClient
 {
+    public Task<string> GetCityNameByCoordinatesAsync(float latitude, float longitude);
+
     public Task<(float Latitude, float Longitude)> GetCoordinatesByCityNameAsync(string cityName);
 
     public Task<Models.Weather> GetCurrentWeatherAsync(string cityName);
@@ -16,5 +18,6 @@ public interface IWeatherApiClient
     
     public Task<float> GetRainChanceAsync(string cityName);
     
-    public Task<Models.Weather> GetMinimizedWeatherAsync(string cityName);  
+    public Task<Models.Weather> GetMinimizedWeatherAsync(string cityName);
+
 }

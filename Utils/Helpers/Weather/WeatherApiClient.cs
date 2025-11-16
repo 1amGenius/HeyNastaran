@@ -1,4 +1,7 @@
-﻿using Nastaran_bot.Utils.Helpers.Mapper;
+﻿using System.Text.Json;
+
+using Nastaran_bot.Models;
+using Nastaran_bot.Utils.Helpers.Mapper;
 
 using OpenMeteo;
 using OpenMeteo.AirQuality;
@@ -37,12 +40,47 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
     }
 
     // ========================
+    // GET CITY NAME FROM LANGITUDE AND LONGITUDE
+    // ========================
+    public async Task<string> GetCityNameByCoordinatesAsync(float latitude, float longitude)
+    {
+        try
+        {
+            using var http = new HttpClient();
+
+            string url =
+                $"https://nominatim.openstreetmap.org/reverse?lat={latitude}&lon={longitude}&format=json&zoom=10&addressdetails=1";
+
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; TelegramBot/1.0)");
+
+            string json = await http.GetStringAsync(url);
+
+            NominatimResponse data = JsonSerializer.Deserialize<NominatimResponse>(json);
+
+            string city = data?.Address?.City
+                       ?? data?.Address?.Town
+                       ?? data?.Address?.Village
+                       ?? data?.Address?.Hamlet;
+
+            if (string.IsNullOrWhiteSpace(city))
+                throw new Exception("City name not found in reverse geocoding response.");
+
+            return city;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Reverse geocoding failed for lat={Lat}, lon={Lon}", latitude, longitude);
+            throw;
+        }
+    }
+
+    // ========================
     // CURRENT WEATHER
     // ========================
     public async Task<Models.Weather> GetCurrentWeatherAsync(string cityName)
     {
         try
-        {
+        {   
             WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
             if (result?.Current == null)
             {
@@ -75,7 +113,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching current weather for city {cityName}", cityName);
+            _logger.LogError(ex, "Error fetching current weather for {cityName}", cityName);
             throw;
         }
     }
@@ -137,7 +175,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching hourly forecast for city {cityName}", cityName);
+            _logger.LogError(ex, "Error fetching hourly forecast for {cityName}", cityName);
             throw;
         }
     }
@@ -208,7 +246,7 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching daily forecast for city {cityName}", cityName);
+            _logger.LogError(ex, "Error fetching daily forecast for {cityName}", cityName);
             throw;
         }
     }
