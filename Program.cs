@@ -9,6 +9,9 @@ using Nastaran_bot.Services.Idea;
 using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
 using Nastaran_bot.Services.TelegramBot.Handlers.Commands;
+using Nastaran_bot.Services.TelegramBot.Handlers.Updates;
+using Nastaran_bot.Services.TelegramBot.Interfaces;
+using Nastaran_bot.Services.TelegramBot.Routing;
 using Nastaran_bot.Services.User;
 using Nastaran_bot.Utils.Helpers.Music;
 using Nastaran_bot.Utils.Helpers.Scheduler;
@@ -83,10 +86,16 @@ builder.Services.AddScoped<IDailyNoteService, DailyNoteService>();
 builder.Services.AddScoped<IIdeaService, IdeaService>();
 builder.Services.AddScoped<IInspirationService, InspirationService>();
 
+// COMMAND handlers
 builder.Services.AddScoped<ICommandHandler, NoteCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, IdeaCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, InspirationCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, WeatherCommandHandler>();
+
+// UPDATE handlers
+builder.Services.AddScoped<IUpdateHandler, WeatherLocationHandler>();
+
+// Routers
 builder.Services.AddScoped<CommandRouter>();
 
 // ========================

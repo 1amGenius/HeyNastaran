@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types;
 
-namespace Nastaran_bot.Services.TelegramBot.Handlers.Commands;
+namespace Nastaran_bot.Services.TelegramBot.Interfaces;
 
 public interface ICommandHandler
 {

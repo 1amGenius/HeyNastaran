@@ -1,4 +1,5 @@
 ﻿using Nastaran_bot.Services.Idea;
+using Nastaran_bot.Services.TelegramBot.Interfaces;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
