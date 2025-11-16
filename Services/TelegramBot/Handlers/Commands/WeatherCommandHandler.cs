@@ -22,6 +22,12 @@ public class WeatherCommandHandler(
     {
         try
         {
+            string[] parts = update.Message!.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 1)
+            {
+                return; 
+            }
+
             if (update.Type != UpdateType.Message || update.Message?.Text == null)
             {
                 return;
