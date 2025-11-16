@@ -97,6 +97,7 @@ builder.Services.AddScoped<IUpdateHandler, WeatherLocationHandler>();
 
 // Routers
 builder.Services.AddScoped<CommandRouter>();
+builder.Services.AddScoped<UpdateRouter>();
 
 // ========================
 // 8. TelegramBotService DI
