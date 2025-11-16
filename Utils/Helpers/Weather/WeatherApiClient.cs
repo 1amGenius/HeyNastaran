@@ -2,6 +2,7 @@
 
 using OpenMeteo;
 using OpenMeteo.AirQuality;
+using OpenMeteo.Geocoding;
 using OpenMeteo.Weather.ResponseModel;
 
 namespace Nastaran_bot.Utils.Helpers.Weather;
@@ -10,6 +11,30 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
 {
     private readonly OpenMeteoClient _client = client;
     private readonly ILogger<WeatherApiClient> _logger = logger;
+
+    // ========================
+    // GET LANGITUDE AND LONGITUDE FROM CITY NAME
+    // ========================
+    public async Task<(double Latitude, double Longitude)> GetCoordinatesByCityNameAsync(string cityName)
+    {
+        try
+        {
+            var geocodingOptions = new GeocodingOptions(cityName, "en", 1);
+            GeocodingApiResponse response = await _client.GetLocationDataAsync(geocodingOptions);
+            if (response?.Locations == null || response.Locations.Length == 0)
+            {
+                throw new Exception($"No geocoding results found for city: {cityName}");
+            }
+
+            LocationData location = response.Locations[0];
+            return (location.Latitude, location.Longitude);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching coordinates for city: {CityName}", cityName);
+            throw;
+        }
+    }
 
     // ========================
     // CURRENT WEATHER

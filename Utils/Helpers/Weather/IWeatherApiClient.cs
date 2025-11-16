@@ -2,6 +2,8 @@
 
 public interface IWeatherApiClient
 {
+    public Task<(double Latitude, double Longitude)> GetCoordinatesByCityNameAsync(string cityName);
+
     public Task<Models.Weather> GetCurrentWeatherAsync(double latitude, double longitude);
     
     public Task<Models.Weather> GetHourlyForecastAsync(double latitude, double longitude, int hours = 24);
@@ -10,7 +12,6 @@ public interface IWeatherApiClient
     
     public Task<Models.Weather> GetFullWeatherReportAsync(double latitude, double longitude);
      
-    // Future methods (extendable)
     public Task<double> GetUvIndexAsync(double latitude, double longitude);
     
     public Task<double> GetRainChanceAsync(double latitude, double longitude);
