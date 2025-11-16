@@ -93,6 +93,7 @@ builder.Services.AddScoped<ICommandHandler, InspirationCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, WeatherCommandHandler>();
 
 // UPDATE handlers
+builder.Services.AddScoped<IUpdateHandler, WeatherCityHandler>();
 builder.Services.AddScoped<IUpdateHandler, WeatherLocationHandler>();
 
 // Routers
