@@ -41,12 +41,10 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
     // ======================================================
     // CURRENT WEATHER
     // ======================================================
-    public async Task<Models.Weather> GetCurrentWeatherAsync(string cityName)
+    public async Task<Models.Weather> GetCurrentWeatherAsync(float latitude, float longitude)
     {
         try
         {
-            (float latitude, float longitude) = await GetCoordinatesByCityNameAsync(cityName);
-
             string url = WeatherApiUrls.Current(latitude, longitude);
 
             WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
@@ -99,7 +97,7 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching current weather for {cityName}", cityName);
+            _logger.LogError(ex, "Error fetching current weather for lat {lat} lon {lon}", latitude, longitude);
             throw;
         }
     }
@@ -107,12 +105,10 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
     // ======================================================
     // HOURLY FORECAST
     // ======================================================
-    public async Task<Models.Weather> GetHourlyForecastAsync(string cityName, int hours = 24)
+    public async Task<Models.Weather> GetHourlyForecastAsync(float latitude, float longitude, int hours = 24)
     {
         try
         {
-            (float latitude, float longitude) = await GetCoordinatesByCityNameAsync(cityName);
-
             string url = WeatherApiUrls.Forecast(
                 latitude,
                 longitude,
@@ -179,7 +175,7 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching hourly forecast for {cityName}", cityName);
+            _logger.LogError(ex, "Error fetching hourly forecast for lat {lat} lon {lon}", latitude, longitude);
             throw;
         }
     }
@@ -187,12 +183,10 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
     // ======================================================
     // DAILY FORECAST
     // ======================================================
-    public async Task<Models.Weather> GetDailyForecastAsync(string cityName, int days = 7)
+    public async Task<Models.Weather> GetDailyForecastAsync(float latitude, float longitude, int days = 7)
     {
         try
         {
-            (float latitude, float longitude) = await GetCoordinatesByCityNameAsync(cityName);
-
             string url = WeatherApiUrls.Forecast(
                 latitude,
                 longitude,
@@ -261,7 +255,7 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching daily forecast for {cityName}", cityName);
+            _logger.LogError(ex, "Error fetching daily forecast for lat {lat} lon {lon}", latitude, longitude);
             throw;
         }
     }
@@ -269,11 +263,11 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
     // ======================================================
     // COMBINED WEATHER REPORT
     // ======================================================
-    public async Task<Models.Weather> GetFullWeatherReportAsync(string cityName)
+    public async Task<Models.Weather> GetFullWeatherReportAsync(float latitude, float longitude)
     {
-        Models.Weather current = await GetCurrentWeatherAsync(cityName);
-        Models.Weather hourly = await GetHourlyForecastAsync(cityName);
-        Models.Weather daily = await GetDailyForecastAsync(cityName);
+        Models.Weather current = await GetCurrentWeatherAsync(latitude, longitude);
+        Models.Weather hourly = await GetHourlyForecastAsync(latitude, longitude);
+        Models.Weather daily = await GetDailyForecastAsync(latitude, longitude);
 
         current.Hourly = hourly.Hourly;
         current.Daily = daily.Daily;
