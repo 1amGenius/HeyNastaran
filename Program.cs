@@ -27,33 +27,23 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // ========================
 // 1. Add Controllers
 // ========================
-// This allows your application to use API controllers for handling HTTP requests.
-// Telegram webhook updates will be sent to a controller endpoint.
 builder.Services.AddControllers();
 
 // ========================
 // 2️. Swagger/OpenAPI
 // ========================
-// Adds Swagger UI for testing your API endpoints in development.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // ========================
 // 3️. MongoDB Client
 // ========================
-// Register a single MongoClient as a singleton.
-// It will be shared across all repositories.
-// Ensure you have the connection string in appsettings.Development.json:
-// "MongoDb": "mongodb+srv://<username>:<password>@cluster0.mongodb.net"
 builder.Services.AddSingleton<IMongoClient>(s =>
     new MongoClient(builder.Configuration.GetConnectionString("MongoDb")));
 
 // ========================
 // 4. TelegramBot Client
 // ========================
-// Register a single TelegramBotClient as a singleton.
-// It will be shared across all services.
-// Ensure you have the bot token in appsettings.Development.json
 builder.Services.AddSingleton<ITelegramBotClient>(sp =>
 {
     IConfiguration config = sp.GetRequiredService<IConfiguration>();
@@ -62,17 +52,17 @@ builder.Services.AddSingleton<ITelegramBotClient>(sp =>
 });
 
 // ========================
-// 5. Weather Client
+// 5. Weather Clients
 // ========================
-// Register a single WeatherHttpClient as a singleton.
-// It will be (mostly) used in all of our functions in Utils/Helpers/WeatherApiClient.
+// 1. Register the HTTP client (transient under the hood, created via factory)
 builder.Services.AddHttpClient<IWeatherHttpClient, WeatherHttpClient>(client => client.Timeout = TimeSpan.FromSeconds(10));
+
+// 2. Register WeatherApiClient as Scoped (can now receive IWeatherHttpClient)
+builder.Services.AddScoped<IWeatherApiClient, WeatherApiClient>();
 
 // ========================
 // 6. Repositories DI
 // ========================
-// Add Scoped repositories for dependency injection.
-// Each repository gets IMongoClient injected automatically.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDailyNoteRepository, DailyNoteRepository>();
 builder.Services.AddScoped<IIdeaRepository, IdeaRepository>();
@@ -81,7 +71,6 @@ builder.Services.AddScoped<IInspirationRepository, InspirationRepository>();
 // ========================
 // 7. Services DI
 // ========================
-// Add Scoped services. They will use the repositories internally.
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDailyNoteService, DailyNoteService>();
 builder.Services.AddScoped<IIdeaService, IdeaService>();
@@ -104,13 +93,13 @@ builder.Services.AddScoped<UpdateRouter>();
 // ========================
 // 8. TelegramBotService DI
 // ========================
-// The orchestrator that handles updates, calling other services.
 builder.Services.AddScoped<TelegramBotService>();
 
 // ========================
 // 9. Helpers DI
 // ========================
-builder.Services.AddSingleton<IWeatherApiClient, WeatherApiClient>();
+// These helpers do not require HttpClient injection,
+// so they can be safely registered as Singletons.
 builder.Services.AddSingleton<IMusicApiClient, MusicApiClient>();
 builder.Services.AddSingleton<IScheduler, Scheduler>();
 
@@ -122,9 +111,6 @@ WebApplication app = builder.Build();
 // ========================
 // 11. Middleware
 // ========================
-// -----------  Nothing yet  -----------
-
-// Enable Swagger UI only in development environment
 if (app.Environment.IsDevelopment())
 {
     _ = app.UseSwagger();
@@ -133,22 +119,15 @@ if (app.Environment.IsDevelopment())
 
 if (!app.Environment.IsDevelopment())
 {
-    // Enable HSTS for production
     _ = app.UseHsts();
-    // Enable HTTPS redirection for production
     _ = app.UseHttpsRedirection();
 }
 
-// Configure the app to listen on all network interfaces at port 8080
-app.Urls.Add("http://0.0.0.0:8080");
+//app.Urls.Add("http://0.0.0.0:8080");
 
-// Enable Authentication middleware (if authentication is added later)
 app.UseAuthentication();
-
-// Enable Authorization middleware (if policies is added later)
 app.UseAuthorization();
 
-// Map controller endpoints (e.g., Telegram webhook)
 app.MapControllers();
 
 // ========================
