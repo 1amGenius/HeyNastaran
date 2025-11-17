@@ -8,9 +8,9 @@ using OpenMeteo.Weather.ResponseModel;
 
 namespace Nastaran_bot.Utils.Helpers.Weather.Clients;
 
-public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiClient> logger) : IWeatherApiClient
+public class WeatherApiClient(IWeatherHttpClient httpClient, ILogger<WeatherApiClient> logger) : IWeatherApiClient
 {
-    private readonly WeatherHttpClient _httpClient = httpClient;
+    private readonly IWeatherHttpClient _httpClient = httpClient;
     private readonly ILogger<WeatherApiClient> _logger = logger;
 
     // ======================================================
@@ -21,8 +21,8 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
         try
         {
             string url = WeatherApiUrls.Geocoding(cityName, count: 1, language: "en");
-
             GeocodingApiResponse response = await _httpClient.GetAsync<GeocodingApiResponse>(url);
+
             if (response?.Locations == null || response.Locations.Length == 0)
             {
                 throw new Exception($"No location results found for city: {cityName}");
@@ -46,35 +46,21 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
         try
         {
             string url = WeatherApiUrls.Current(latitude, longitude);
-
             WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
 
-            if (response?.Current == null || response.Hourly == null || response.Hourly.Time == null || response.Hourly.Uv_index == null || response.Hourly.Cloudcover == null)
+            if (response?.Current == null)
             {
-                throw new Exception("API returned incomplete current weather or hourly data.");
+                throw new Exception("API returned no current weather data.");
             }
 
-            WeatherData mapped = WeatherMapper.MapCurrentWeather(response.Current);
+            Current currentApi = response.Current;
+            WeatherData mapped = WeatherMapper.MapCurrentWeather(currentApi);
 
-            DateTimeOffset currentTime = DateTimeOffset.UtcNow;
-
-            int closestIndex = 0;
-            double minDiff = double.MaxValue;
-            for (int i = 0; i < response.Hourly.Time.Length; i++)
+            (float uvIndex, int cloudCover) nearestHourly = (0f, currentApi.Cloudcover ?? 0);
+            if (response.Hourly != null)
             {
-                DateTimeOffset t = response.Hourly.Time[i];
-                double diff = Math.Abs((t - currentTime).TotalMinutes);
-
-                if (diff < minDiff)
-                {
-                    minDiff = diff;
-                    closestIndex = i;
-                }
+                nearestHourly = GetNearestHourlyData(response.Hourly);
             }
-
-            float uvIndex = response.Hourly.Uv_index[closestIndex].Value;
-            int cloudCover = response.Hourly.Cloudcover[closestIndex].Value;
-            bool isDay = (response.Hourly.Is_day?[closestIndex] ?? 0) == 1;
 
             return new Models.Weather
             {
@@ -88,10 +74,10 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
                     Humidity = mapped.Humidity,
                     WindSpeedKph = mapped.WindSpeed,
                     RainChance = mapped.Precipitation,
-                    CloudCover = cloudCover,
+                    CloudCover = nearestHourly.cloudCover,
+                    UvIndex = nearestHourly.uvIndex,
                     Condition = WeatherMapper.MapCondition(mapped),
-                    Icon = WeatherMapper.MapIcon(mapped),
-                    UvIndex = uvIndex
+                    Icon = WeatherMapper.MapIcon(mapped)
                 }
             };
         }
@@ -109,13 +95,7 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
     {
         try
         {
-            string url = WeatherApiUrls.Forecast(
-                latitude,
-                longitude,
-                hourly: "temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,precipitation,cloudcover,windspeed_10m,uv_index,is_day",
-                forecastDays: 1
-            );
-
+            string url = WeatherApiUrls.Forecast(latitude, longitude, WeatherApiUrls.HourlyVars, forecastDays: 1);
             WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
 
             if (response?.Hourly?.Time == null)
@@ -136,36 +116,30 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
 
             for (int i = 0; i < count; i++)
             {
-                float temp = hourlyData.Temperature_2m?[i] ?? 0f;
-                float feels = hourlyData.Apparent_temperature?[i] ?? temp;
-                float humidity = hourlyData.Relativehumidity_2m?[i] ?? 0f;
-                float windSpeed = hourlyData.Windspeed_10m?[i] ?? 0f;
-                float precipitation = hourlyData.Precipitation?[i] ?? 0f;
-                int cloudCover = hourlyData.Cloudcover?[i] ?? 0;
-                float uvIndex = hourlyData.Uv_index?[i] ?? 0f;
-                bool isDay = (hourlyData.Is_day?[i] ?? 0) == 1;
-
                 var mapped = new WeatherData
                 {
-                    Temperature = temp,
-                    FeelsLike = feels,
-                    Humidity = (int) humidity,
-                    WindSpeed = windSpeed,
-                    Precipitation = precipitation,
-                    CloudCover = cloudCover,
-                    IsDay = isDay
+                    Temperature = hourlyData.Temperature_2m?[i] ?? 0f,
+                    FeelsLike = hourlyData.Apparent_temperature?[i] ?? 0f,
+                    Humidity = (int) (hourlyData.Relativehumidity_2m?[i] ?? 0f),
+                    WindSpeed = hourlyData.Windspeed_10m?[i] ?? 0f,
+                    Precipitation = hourlyData.Precipitation?[i] ?? 0f,
+                    CloudCover = hourlyData.Cloudcover?[i] ?? 0,
+                    IsDay = (hourlyData.Is_day?[i] ?? 0) == 1
                 };
+
+                // Use helper for this hour's nearest data if needed
+                (float uvIndex, _) = GetNearestHourlyData(hourlyData);
 
                 weather.Hourly.Add(new HourlyForecast
                 {
                     Time = hourlyData.Time[i].UtcDateTime,
-                    TemperatureC = temp,
-                    FeelsLikeC = feels,
-                    Humidity = (int) humidity,
-                    WindSpeedKph = windSpeed,
-                    RainChance = precipitation,
-                    CloudCover = cloudCover,
-                    UvIndex = uvIndex,
+                    TemperatureC = mapped.Temperature,
+                    FeelsLikeC = mapped.FeelsLike,
+                    Humidity = mapped.Humidity,
+                    WindSpeedKph = mapped.WindSpeed,
+                    RainChance = mapped.Precipitation,
+                    CloudCover = mapped.CloudCover,
+                    UvIndex = hourlyData.Uv_index?[i] ?? uvIndex,
                     Condition = WeatherMapper.MapCondition(mapped),
                     Icon = WeatherMapper.MapIcon(mapped)
                 });
@@ -187,13 +161,7 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
     {
         try
         {
-            string url = WeatherApiUrls.Forecast(
-                latitude,
-                longitude,
-                hourly: "cloudcover,temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,windspeed_10m,uv_index,is_day",
-                forecastDays: days
-            );
-
+            string url = WeatherApiUrls.Forecast(latitude, longitude, hourly: WeatherApiUrls.HourlyVars, daily: WeatherApiUrls.DailyVars, forecastDays: days);
             WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
 
             if (response?.Daily?.Time == null)
@@ -202,7 +170,7 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
             }
 
             Daily daily = response.Daily;
-            Hourly hourly = response.Hourly; 
+            Hourly hourly = response.Hourly;
 
             int count = Math.Min(days, daily.Time.Length);
 
@@ -273,5 +241,35 @@ public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiCl
         current.Daily = daily.Daily;
 
         return current;
+    }
+
+    // ======================================================
+    // PRIVATE HELPER
+    // ======================================================
+    private static (float uvIndex, int cloudCover) GetNearestHourlyData(Hourly hourly)
+    {
+        if (hourly == null || hourly.Time == null || hourly.Uv_index == null || hourly.Cloudcover == null)
+        {
+            throw new Exception("Hourly weather data is incomplete.");
+        }
+
+        DateTimeOffset currentTime = DateTimeOffset.UtcNow;
+        int closestIndex = 0;
+        double minDiff = double.MaxValue;
+
+        for (int i = 0; i < hourly.Time.Length; i++)
+        {
+            double diff = Math.Abs((hourly.Time[i] - currentTime).TotalMinutes);
+            if (diff < minDiff)
+            {
+                minDiff = diff;
+                closestIndex = i;
+            }
+        }
+
+        float uvIndex = hourly.Uv_index[closestIndex].GetValueOrDefault();
+        int cloudCover = hourly.Cloudcover[closestIndex].GetValueOrDefault();
+
+        return (uvIndex, cloudCover);
     }
 }
