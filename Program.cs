@@ -17,8 +17,6 @@ using Nastaran_bot.Utils.Helpers.Music;
 using Nastaran_bot.Utils.Helpers.Scheduler;
 using Nastaran_bot.Utils.Helpers.Weather;
 
-using OpenMeteo;
-
 using Telegram.Bot;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -61,11 +59,11 @@ builder.Services.AddSingleton<ITelegramBotClient>(sp =>
 });
 
 // ========================
-// 5. Weather Api Client
+// 5. Weather Client
 // ========================
-// Register a single OpenMeteoClient as a singleton.
+// Register a single WeatherHttpClient as a singleton.
 // It will be (mostly) used in all of our functions in Utils/Helpers/WeatherApiClient.
-builder.Services.AddSingleton<OpenMeteoClient>();
+builder.Services.AddHttpClient<IWeatherHttpClient, WeatherHttpClient>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
 // ========================
 // 6. Repositories DI

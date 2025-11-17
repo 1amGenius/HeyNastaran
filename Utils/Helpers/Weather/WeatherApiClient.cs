@@ -1,112 +1,97 @@
-﻿using System.Text.Json;
-
-using Nastaran_bot.Models;
+﻿using Nastaran_bot.Models;
 using Nastaran_bot.Utils.Helpers.Mapper;
+using Nastaran_bot.Utils.Urls;
 
-using OpenMeteo;
-using OpenMeteo.AirQuality;
 using OpenMeteo.Geocoding;
 using OpenMeteo.Weather.ResponseModel;
 
 namespace Nastaran_bot.Utils.Helpers.Weather;
 
-public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> logger) : IWeatherApiClient
+public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiClient> logger) : IWeatherApiClient
 {
-    private readonly OpenMeteoClient _client = client;
+    private readonly WeatherHttpClient _httpClient = httpClient;
     private readonly ILogger<WeatherApiClient> _logger = logger;
 
-    // ========================
-    // GET LANGITUDE AND LONGITUDE FROM CITY NAME
-    // ========================
+    // ======================================================
+    // GEOCODING – GET COORDINATES FROM CITY NAME
+    // ======================================================
     public async Task<(float Latitude, float Longitude)> GetCoordinatesByCityNameAsync(string cityName)
     {
         try
         {
-            var geocodingOptions = new GeocodingOptions(cityName, "en", 1);
-            GeocodingApiResponse response = await _client.GetLocationDataAsync(geocodingOptions);
+            string url = WeatherApiUrls.Geocoding(cityName, count: 1, language: "en");
+
+            GeocodingApiResponse response = await _httpClient.GetAsync<GeocodingApiResponse>(url);
             if (response?.Locations == null || response.Locations.Length == 0)
             {
-                throw new Exception($"No geocoding results found for city: {cityName}");
+                throw new Exception($"No location results found for city: {cityName}");
             }
 
-            LocationData location = response.Locations[0];
-            return (location.Latitude, location.Longitude);
+            LocationData loc = response.Locations[0];
+            return ((float) loc.Latitude, (float) loc.Longitude);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching coordinates for city: {CityName}", cityName);
+            _logger.LogError(ex, "Error fetching coordinates for city: {cityName}", cityName);
             throw;
         }
     }
 
-    // ========================
-    // GET CITY NAME FROM LANGITUDE AND LONGITUDE
-    // ========================
-    public async Task<string> GetCityNameByCoordinatesAsync(float latitude, float longitude)
-    {
-        try
-        {
-            using var http = new HttpClient();
-
-            string url =
-                $"https://nominatim.openstreetmap.org/reverse?lat={latitude}&lon={longitude}&format=json&zoom=10&addressdetails=1";
-
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; TelegramBot/1.0)");
-
-            string json = await http.GetStringAsync(url);
-
-            NominatimResponse data = JsonSerializer.Deserialize<NominatimResponse>(json);
-
-            string city = data?.Address?.City
-                       ?? data?.Address?.Town
-                       ?? data?.Address?.Village
-                       ?? data?.Address?.Hamlet;
-
-            if (string.IsNullOrWhiteSpace(city))
-                throw new Exception("City name not found in reverse geocoding response.");
-
-            return city;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Reverse geocoding failed for lat={Lat}, lon={Lon}", latitude, longitude);
-            throw;
-        }
-    }
-
-    // ========================
+    // ======================================================
     // CURRENT WEATHER
-    // ========================
+    // ======================================================
     public async Task<Models.Weather> GetCurrentWeatherAsync(string cityName)
     {
         try
-        {   
-            WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
-            if (result?.Current == null)
+        {
+            (float latitude, float longitude) = await GetCoordinatesByCityNameAsync(cityName);
+
+            string url = WeatherApiUrls.Current(latitude, longitude);
+
+            WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
+
+            if (response?.Current == null || response.Hourly == null || response.Hourly.Time == null || response.Hourly.Uv_index == null || response.Hourly.Cloudcover == null)
             {
-                throw new Exception("Weather API returned null current weather.");
+                throw new Exception("API returned incomplete current weather or hourly data.");
             }
 
-            WeatherData mappedCurrent = WeatherMapper.MapCurrentWeather(result.Current);
+            WeatherData mapped = WeatherMapper.MapCurrentWeather(response.Current);
 
-            // Fetch UV index via air quality API
-            float uvIndex = await FetchCurrentUvIndex(result.Latitude, result.Longitude);
+            DateTimeOffset currentTime = DateTimeOffset.UtcNow;
+
+            int closestIndex = 0;
+            double minDiff = double.MaxValue;
+            for (int i = 0; i < response.Hourly.Time.Length; i++)
+            {
+                DateTimeOffset t = response.Hourly.Time[i];
+                double diff = Math.Abs((t - currentTime).TotalMinutes);
+
+                if (diff < minDiff)
+                {
+                    minDiff = diff;
+                    closestIndex = i;
+                }
+            }
+
+            float uvIndex = response.Hourly.Uv_index[closestIndex].Value;
+            int cloudCover = response.Hourly.Cloudcover[closestIndex].Value;
+            bool isDay = (response.Hourly.Is_day?[closestIndex] ?? 0) == 1;
 
             return new Models.Weather
             {
-                Latitude = result.Latitude,
-                Longitude = result.Longitude,
-                Timezone = result.Timezone ?? "UTC",
-                Current = new Models.CurrentWeather
+                Latitude = latitude,
+                Longitude = longitude,
+                Timezone = response.Timezone ?? "UTC",
+                Current = new CurrentWeather
                 {
-                    TemperatureC = mappedCurrent.Temperature,
-                    FeelsLikeC = mappedCurrent.FeelsLike,
-                    Humidity = mappedCurrent.Humidity,
-                    WindSpeedKph = mappedCurrent.WindSpeed,
-                    RainChance = mappedCurrent.Precipitation,
-                    CloudCover = mappedCurrent.CloudCover,
-                    Condition = WeatherMapper.MapCondition(mappedCurrent),
-                    Icon = WeatherMapper.MapIcon(mappedCurrent),
+                    TemperatureC = mapped.Temperature,
+                    FeelsLikeC = mapped.FeelsLike,
+                    Humidity = mapped.Humidity,
+                    WindSpeedKph = mapped.WindSpeed,
+                    RainChance = mapped.Precipitation,
+                    CloudCover = cloudCover,
+                    Condition = WeatherMapper.MapCondition(mapped),
+                    Icon = WeatherMapper.MapIcon(mapped),
                     UvIndex = uvIndex
                 }
             };
@@ -118,56 +103,74 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
     }
 
-    // ========================
+    // ======================================================
     // HOURLY FORECAST
-    // ========================
+    // ======================================================
     public async Task<Models.Weather> GetHourlyForecastAsync(string cityName, int hours = 24)
     {
         try
         {
-            WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
+            (float latitude, float longitude) = await GetCoordinatesByCityNameAsync(cityName);
 
-            if (result?.Hourly?.Time == null)
+            string url = WeatherApiUrls.Forecast(
+                latitude,
+                longitude,
+                hourly: "temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,precipitation,cloudcover,windspeed_10m,uv_index,is_day",
+                forecastDays: 1
+            );
+
+            WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
+
+            if (response?.Hourly?.Time == null)
             {
-                throw new Exception("Weather API returned null hourly forecast.");
+                throw new Exception("API returned no hourly data.");
             }
+
+            Hourly hourlyData = response.Hourly;
+            int count = Math.Min(hours, hourlyData.Time.Length);
 
             var weather = new Models.Weather
             {
-                Latitude = result.Latitude,
-                Longitude = result.Longitude,
-                Timezone = result.Timezone ?? "UTC",
+                Latitude = latitude,
+                Longitude = longitude,
+                Timezone = response.Timezone ?? "UTC",
                 Hourly = []
             };
 
-            int count = Math.Min(hours, result.Hourly.Time.Length);
-
-            // Fetch hourly UV index
-            float[] hourlyUv = await FetchHourlyUvIndex(result.Latitude, result.Longitude, count);
-
             for (int i = 0; i < count; i++)
             {
-                var hourlyData = new Current
+                float temp = hourlyData.Temperature_2m?[i] ?? 0f;
+                float feels = hourlyData.Apparent_temperature?[i] ?? temp;
+                float humidity = hourlyData.Relativehumidity_2m?[i] ?? 0f;
+                float windSpeed = hourlyData.Windspeed_10m?[i] ?? 0f;
+                float precipitation = hourlyData.Precipitation?[i] ?? 0f;
+                int cloudCover = hourlyData.Cloudcover?[i] ?? 0;
+                float uvIndex = hourlyData.Uv_index?[i] ?? 0f;
+                bool isDay = (hourlyData.Is_day?[i] ?? 0) == 1;
+
+                var mapped = new WeatherData
                 {
-                    Precipitation = result.Hourly.Precipitation?[i] ?? 0f,
-                    Cloudcover = result.Hourly.Cloudcover?[i] ?? 0,
-                    Is_day = 1 // Assuming daytime
+                    Temperature = temp,
+                    FeelsLike = feels,
+                    Humidity = (int) humidity,
+                    WindSpeed = windSpeed,
+                    Precipitation = precipitation,
+                    CloudCover = cloudCover,
+                    IsDay = isDay
                 };
 
-                WeatherData mappedHourly = WeatherMapper.MapCurrentWeather(hourlyData);
-
-                weather.Hourly.Add(new Models.HourlyForecast
+                weather.Hourly.Add(new HourlyForecast
                 {
-                    Time = result.Hourly.Time[i].DateTime,
-                    TemperatureC = result.Hourly.Temperature_2m?[i] ?? 0f,
-                    FeelsLikeC = result.Hourly.Apparent_temperature?[i] ?? result.Hourly.Temperature_2m?[i] ?? 0f,
-                    WindSpeedKph = result.Hourly.Windspeed_10m?[i] ?? 0f,
-                    Humidity = result.Hourly.Relativehumidity_2m?[i] ?? 0f,
-                    RainChance = result.Hourly.Precipitation?[i] ?? 0f,
-                    CloudCover = result.Hourly.Cloudcover?[i] ?? 0f,
-                    Condition = WeatherMapper.MapCondition(mappedHourly),
-                    Icon = WeatherMapper.MapIcon(mappedHourly),
-                    UvIndex = hourlyUv.Length > i ? hourlyUv[i] : 0
+                    Time = hourlyData.Time[i].UtcDateTime,
+                    TemperatureC = temp,
+                    FeelsLikeC = feels,
+                    Humidity = (int) humidity,
+                    WindSpeedKph = windSpeed,
+                    RainChance = precipitation,
+                    CloudCover = cloudCover,
+                    UvIndex = uvIndex,
+                    Condition = WeatherMapper.MapCondition(mapped),
+                    Icon = WeatherMapper.MapIcon(mapped)
                 });
             }
 
@@ -180,65 +183,76 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
     }
 
-    // ========================
+    // ======================================================
     // DAILY FORECAST
-    // ========================
+    // ======================================================
     public async Task<Models.Weather> GetDailyForecastAsync(string cityName, int days = 7)
     {
         try
         {
-            WeatherForecast result = await _client.QueryWeatherApiAsync(cityName);
+            (float latitude, float longitude) = await GetCoordinatesByCityNameAsync(cityName);
 
-            if (result?.Daily?.Time == null)
+            string url = WeatherApiUrls.Forecast(
+                latitude,
+                longitude,
+                hourly: "cloudcover,temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,windspeed_10m,uv_index,is_day",
+                forecastDays: days
+            );
+
+            WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
+
+            if (response?.Daily?.Time == null)
             {
-                throw new Exception("Weather API returned null daily forecast.");
+                throw new Exception("API returned no daily data.");
             }
+
+            Daily daily = response.Daily;
+            Hourly hourly = response.Hourly; 
+
+            int count = Math.Min(days, daily.Time.Length);
 
             var weather = new Models.Weather
             {
-                Latitude = result.Latitude,
-                Longitude = result.Longitude,
-                Timezone = result.Timezone ?? "UTC",
+                Latitude = latitude,
+                Longitude = longitude,
+                Timezone = response.Timezone ?? "UTC",
                 Daily = []
             };
 
-            int count = Math.Min(days, result.Daily.Time.Length);
-
             for (int i = 0; i < count; i++)
             {
-                DateTime sunrise = DateTime.MinValue;
-                DateTime sunset = DateTime.MinValue;
+                var date = daily.Time[i].ToDateTime(TimeOnly.MinValue);
 
-                if (result.Daily.Sunrise != null && i < result.Daily.Sunrise.Length)
+                DateTime sunrise = DateTimeOffset.TryParse(daily.Sunrise?[i], out DateTimeOffset s1) ? s1.DateTime : DateTime.MinValue;
+                DateTime sunset = DateTimeOffset.TryParse(daily.Sunset?[i], out DateTimeOffset s2) ? s2.DateTime : DateTime.MinValue;
+
+                float precipitation = daily.Precipitation_sum?[i] ?? 0f;
+
+                int cloudCover = 0;
+                if (hourly?.Time != null && hourly.Cloudcover != null)
                 {
-                    _ = DateTime.TryParse(result.Daily.Sunrise[i], out sunrise);
+                    var dailyHours = hourly.Time
+                        .Select((t, idx) => new { Time = t, Cloud = hourly.Cloudcover[idx] ?? 0 })
+                        .Where(x => x.Time.Date == date.Date)
+                        .ToList();
+
+                    if (dailyHours.Count > 0)
+                    {
+                        cloudCover = (int) Math.Round(dailyHours.Average(x => x.Cloud));
+                    }
                 }
 
-                if (result.Daily.Sunset != null && i < result.Daily.Sunset.Length)
+                weather.Daily.Add(new DailyForecast
                 {
-                    _ = DateTime.TryParse(result.Daily.Sunset[i], out sunset);
-                }
-
-                var dailyData = new Current
-                {
-                    Precipitation = result.Daily.Precipitation_sum?[i] ?? 0f,
-                    Cloudcover = 0,
-                    Is_day = 1
-                };
-
-                WeatherData mappedDaily = WeatherMapper.MapCurrentWeather(dailyData);
-
-                weather.Daily.Add(new Models.DailyForecast
-                {
-                    Date = result.Daily.Time[i].ToDateTime(TimeOnly.MinValue),
-                    TemperatureMinC = result.Daily.Temperature_2m_min?[i] ?? 0f,
-                    TemperatureMaxC = result.Daily.Temperature_2m_max?[i] ?? 0f,
+                    Date = date,
+                    TemperatureMinC = daily.Temperature_2m_min?[i] ?? 0f,
+                    TemperatureMaxC = daily.Temperature_2m_max?[i] ?? 0f,
                     Sunrise = sunrise,
                     Sunset = sunset,
-                    RainChance = mappedDaily.Precipitation,
-                    CloudCover = mappedDaily.CloudCover,
-                    Condition = WeatherMapper.MapCondition(mappedDaily),
-                    Icon = WeatherMapper.MapIcon(mappedDaily)
+                    RainChance = precipitation,
+                    CloudCover = cloudCover,
+                    Condition = WeatherMapper.MapCondition(precipitation, cloudCover, true),
+                    Icon = WeatherMapper.MapIcon(precipitation, cloudCover, true)
                 });
             }
 
@@ -251,9 +265,9 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         }
     }
 
-    // ========================
-    // FULL WEATHER REPORT
-    // ========================
+    // ======================================================
+    // COMBINED WEATHER REPORT
+    // ======================================================
     public async Task<Models.Weather> GetFullWeatherReportAsync(string cityName)
     {
         Models.Weather current = await GetCurrentWeatherAsync(cityName);
@@ -264,83 +278,5 @@ public class WeatherApiClient(OpenMeteoClient client, ILogger<WeatherApiClient> 
         current.Daily = daily.Daily;
 
         return current;
-    }
-
-    // ========================
-    // UV INDEX ONLY
-    // ========================
-    public async Task<float> GetUvIndexAsync(float latitude, float longitude) => await FetchCurrentUvIndex(latitude, longitude);
-
-    // ========================
-    // RAIN CHANCE ONLY
-    // ========================
-    public async Task<float> GetRainChanceAsync(string cityName)
-    {
-        Models.Weather weather = await GetCurrentWeatherAsync(cityName);
-        return weather.Current.RainChance ?? 0f;
-    }
-
-    // ========================
-    // MINIMAL WEATHER SUMMARY
-    // ========================
-    public async Task<Models.Weather> GetMinimizedWeatherAsync(string cityName)
-    {
-        Models.Weather current = await GetCurrentWeatherAsync(cityName);
-
-        return new Models.Weather
-        {
-            Latitude = current.Latitude,
-            Longitude = current.Longitude,
-            Timezone = current.Timezone,
-            Current = new Models.CurrentWeather
-            {
-                TemperatureC = current.Current.TemperatureC,
-                FeelsLikeC = current.Current.FeelsLikeC,
-                Humidity = current.Current.Humidity,
-                WindSpeedKph = current.Current.WindSpeedKph,
-                Condition = current.Current.Condition,
-                Icon = current.Current.Icon,
-                UvIndex = current.Current.UvIndex
-            }
-        };
-    }
-
-    // ========================
-    // HELPERS FOR UV INDEX
-    // ========================
-    private async Task<float> FetchCurrentUvIndex(float latitude, float longitude)
-    {
-        try
-        {
-            var options = new AirQualityOptions(latitude, longitude)
-            {
-                Hourly = new AirQualityOptions.HourlyOptions(AirQualityOptions.HourlyOptionsParameter.uv_index)
-            };
-
-            AirQualityResponse response = await _client.QueryAirQualityAsync(options);
-            return response?.Hourly?.Uv_index?.FirstOrDefault() ?? 0;
-        }
-        catch
-        {
-            return 0;
-        }
-    }
-
-    private async Task<float[]> FetchHourlyUvIndex(float latitude, float longitude, int hours)
-    {
-        try
-        {
-            var options = new AirQualityOptions(latitude, longitude)
-            {
-                Hourly = new AirQualityOptions.HourlyOptions(AirQualityOptions.HourlyOptionsParameter.uv_index)
-            };
-
-            AirQualityResponse response = await _client.QueryAirQualityAsync(options);
-            return response?.Hourly?.Uv_index?.Take(hours).Select(v => v ?? 0).ToArray() ?? new float[hours];
-        }
-        catch
-        {
-            return new float[hours];
-        }
     }
 }

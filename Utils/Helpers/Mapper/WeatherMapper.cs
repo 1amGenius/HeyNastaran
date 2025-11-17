@@ -161,11 +161,20 @@ public static class WeatherMapper
     private static string MapIconInternal(float precipitation, int cloudCover, bool isDay)
     {
         if (precipitation >= 3f)
+        {
             return "🌧";
+        }
+
         if (cloudCover >= 80)
+        {
             return "☁️";
+        }
+
         if (isDay && cloudCover <= 20)
+        {
             return "☀️";
+        }
+
         return "🌤"; // partly cloudy fallback
     }
 }
