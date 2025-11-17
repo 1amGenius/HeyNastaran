@@ -1,4 +1,4 @@
-﻿namespace Nastaran_bot.Utils.Helpers.Weather;
+﻿namespace Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
 public interface IWeatherHttpClient
 {

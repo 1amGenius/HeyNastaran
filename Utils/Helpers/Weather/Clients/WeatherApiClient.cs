@@ -1,11 +1,12 @@
 ﻿using Nastaran_bot.Models;
-using Nastaran_bot.Utils.Helpers.Mapper;
+using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
+using Nastaran_bot.Utils.Mapper;
 using Nastaran_bot.Utils.Urls;
 
 using OpenMeteo.Geocoding;
 using OpenMeteo.Weather.ResponseModel;
 
-namespace Nastaran_bot.Utils.Helpers.Weather;
+namespace Nastaran_bot.Utils.Helpers.Weather.Clients;
 
 public class WeatherApiClient(WeatherHttpClient httpClient, ILogger<WeatherApiClient> logger) : IWeatherApiClient
 {

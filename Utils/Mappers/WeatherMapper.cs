@@ -1,4 +1,4 @@
-﻿namespace Nastaran_bot.Utils.Helpers.Mapper;
+﻿namespace Nastaran_bot.Utils.Mapper;
 
 using OpenMeteo.Weather.ResponseModel;
 

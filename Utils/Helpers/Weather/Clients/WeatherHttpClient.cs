@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace Nastaran_bot.Utils.Helpers.Weather;
+using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
+
+namespace Nastaran_bot.Utils.Helpers.Weather.Clients;
 
 public class WeatherHttpClient : IWeatherHttpClient
 {
