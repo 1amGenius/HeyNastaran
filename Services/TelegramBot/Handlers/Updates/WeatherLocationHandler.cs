@@ -33,8 +33,7 @@ public class WeatherLocationHandler(
             long chatId = update.Message.Chat.Id;
             float lat = (float) update.Message.Location.Latitude;
             float lon = (float) update.Message.Location.Longitude;
-            string city = await _weatherApi.GetCityNameByCoordinatesAsync(lat, lon);
-            Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(city);
+            Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(lat, lon);
             Models.CurrentWeather cw = weather.Current;
 
             string msg =

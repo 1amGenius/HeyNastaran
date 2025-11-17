@@ -13,9 +13,12 @@ using Nastaran_bot.Services.TelegramBot.Handlers.Updates;
 using Nastaran_bot.Services.TelegramBot.Interfaces;
 using Nastaran_bot.Services.TelegramBot.Routing;
 using Nastaran_bot.Services.User;
-using Nastaran_bot.Utils.Helpers.Music;
-using Nastaran_bot.Utils.Helpers.Scheduler;
-using Nastaran_bot.Utils.Helpers.Weather;
+using Nastaran_bot.Utils.Helpers.Music.Clients;
+using Nastaran_bot.Utils.Helpers.Music.Interfaces;
+using Nastaran_bot.Utils.Helpers.Scheduler.Clients;
+using Nastaran_bot.Utils.Helpers.Scheduler.Interfaces;
+using Nastaran_bot.Utils.Helpers.Weather.Clients;
+using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
 using Telegram.Bot;
 

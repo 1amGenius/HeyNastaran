@@ -53,7 +53,9 @@ public class WeatherCityHandler(
 
             string city = string.Join(' ', parts.Skip(1)).Trim();
 
-            Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(city);
+            (float latitude, float longitude) = await _weatherApi.GetCoordinatesByCityNameAsync(city);
+            
+            Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(latitude, longitude);
             Models.CurrentWeather cw = weather.Current;
 
             string msg =
