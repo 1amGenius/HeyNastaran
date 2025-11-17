@@ -1,5 +1,5 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
-using Nastaran_bot.Utils.Helpers.Weather;
+using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
 using OpenMeteo.Geocoding;
 
