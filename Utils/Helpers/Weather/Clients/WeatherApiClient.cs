@@ -95,7 +95,7 @@ public class WeatherApiClient(IWeatherHttpClient httpClient, ILogger<WeatherApiC
     {
         try
         {
-            string url = WeatherApiUrls.Forecast(latitude, longitude, WeatherApiUrls.HourlyVars, forecastDays: 1);
+            string url = WeatherApiUrls.Forecast(latitude, longitude, forecastDays: 1);
             WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
 
             if (response?.Hourly?.Time == null)
@@ -161,7 +161,7 @@ public class WeatherApiClient(IWeatherHttpClient httpClient, ILogger<WeatherApiC
     {
         try
         {
-            string url = WeatherApiUrls.Forecast(latitude, longitude, hourly: WeatherApiUrls.HourlyVars, daily: WeatherApiUrls.DailyVars, forecastDays: days);
+            string url = WeatherApiUrls.Forecast(latitude, longitude, forecastDays: days);
             WeatherForecast response = await _httpClient.GetAsync<WeatherForecast>(url);
 
             if (response?.Daily?.Time == null)
