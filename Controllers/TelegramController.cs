@@ -2,8 +2,12 @@
 
 using Nastaran_bot.Services.TelegramBot;
 
+using Telegram.Bot.Types;
+
 namespace Nastaran_bot.Controllers;
 
+[ApiController]
+[Route("api/[controller]/[action]")]
 public class TelegramController(TelegramBotService telegramBotService) : ControllerBase
 {
     private readonly TelegramBotService _telegramBotService = telegramBotService;
