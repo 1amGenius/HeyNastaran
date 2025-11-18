@@ -2,27 +2,82 @@
 
 public static class WeatherApiUrls
 {
+    public const string CurrentVars =
+    "temperature_2m," +                // Actual air temperature at 2 meters
+    "relative_humidity_2m," +          // Humidity percentage
+    "apparent_temperature," +          // Feels-like temperature
+    "is_day," +                        // 1 = day, 0 = night
+    "precipitation," +                 // Total precipitation
+    "rain," +                          // Rain volume
+    "showers," +                       // Shower volume
+    "snowfall," +                      // Snowfall volume
+    "weather_code," +                  // Weather condition code
+    "cloudcover," +                    // Total cloud cover %
+    "pressure_msl," +                  // Sea-level pressure
+    "surface_pressure," +              // Local surface pressure
+    "windspeed_10m," +                 // Wind speed at 10m
+    "winddirection_10m," +             // Wind direction degrees
+    "windgusts_10m";                   // Gust speed at 10m
+
     public const string HourlyVars =
-        "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability," +
-        "precipitation,rain,showers,snowfall,snow_depth,weather_code,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high," +
-        "windspeed_10m,winddirection_10m,windgusts_10m,uv_index,uv_index_clear_sky,is_day";
+    "temperature_2m," +                 // Actual air temperature at 2 meters
+    "relative_humidity_2m," +           // Humidity percentage
+    "apparent_temperature," +           // Feels-like temperature
+    "precipitation_probability," +      // Probability of precipitation (%)
+    "precipitation," +                  // Total precipitation (mm)
+    "rain," +                           // Rain volume (mm)
+    "showers," +                        // Shower volume (mm)
+    "snowfall," +                       // Snowfall amount (cm/mm depending on API)
+    "snow_depth," +                     // Snow depth on ground
+    "weather_code," +                   // Weather condition code
+    "cloudcover," +                     // Total cloud cover %
+    "cloudcover_low," +                 // Low-level cloud cover %
+    "cloudcover_mid," +                 // Mid-level cloud cover %
+    "cloudcover_high," +                // High-level cloud cover %
+    "visibility," +                     // Visibility
+    "windspeed_10m," +                  // Wind speed at 10m height
+    "winddirection_10m," +              // Wind direction in degrees
+    "windgusts_10m," +                  // Wind gusts at 10m height
+    "uv_index," +                       // UV index
+    "uv_index_clear_sky," +             // UV index assuming clear skies
+    "is_day";                           // 1 = day, 0 = night
 
     public const string DailyVars =
-        "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min," +
-        "sunrise,sunset,daylight_duration,sunshine_duration,uv_index,uv_index_clear_sky,rain_sum,showers_sum,snowfall_sum," +
-        "precipitation_sum,precipitation_hours,precipitation_probability_max,windgusts_10m_max,windspeed_10m_max," +
-        "dominant_wind_direction_10m,shortwave_radiation_sum,et0_fao_evapotranspiration_sum";
+    "weather_code," +                   // Weather condition code
+    "temperature_2m_max," +             // Max temp of the day
+    "temperature_2m_min," +             // Min temp of the day
+    "apparent_temperature_max," +       // Max feels-like temp
+    "apparent_temperature_min," +       // Min feels-like temp
+    "sunrise," +                        // Local sunrise time
+    "sunset," +                         // Local sunset time
+    "daylight_duration," +              // Duration of daylight in seconds
+    "sunshine_duration," +              // Total sunny hours
+    "uv_index_max," +                   // UV index average/max (API specific)
+    "uv_index_clear_sky_max," +         // UV index under clear sky
+    "rain_sum," +                       // Total rain for the day
+    "showers_sum," +                    // Total showers for the day
+    "snowfall_sum," +                   // Total snowfall for the day
+    "precipitation_sum," +              // Total precipitation (all types)
+    "precipitation_hours," +            // Hours with measurable precipitation
+    "precipitation_probability_max," +  // Max probability of precipitation
+    "windgusts_10m_max," +              // Max gusts at 10m height
+    "windspeed_10m_max," +              // Max sustained wind at 10m
+    "winddirection_10m_dominant," +     // Most common wind direction of the day
+    "shortwave_radiation_sum," +        // Total incoming solar radiation (W/m²)
+    "et0_fao_evapotranspiration";       // Moisture evaporation estimate (agriculture metric)
 
-    // Use forecast endpoint with hourly data to get both current + nearest hourly for UV
+    // Main forecast endpoint with CURRENT + HOURLY + DAILY
     public static string Forecast(
         float lat,
         float lon,
+        string current = CurrentVars,
         string hourly = HourlyVars,
         string daily = DailyVars,
         string timezone = "auto",
         int forecastDays = 7)
         => $"https://api.open-meteo.com/v1/forecast" +
            $"?latitude={lat}&longitude={lon}" +
+           $"&current={current}" +
            $"&hourly={hourly}" +
            $"&daily={daily}" +
            $"&timezone={timezone}" +
@@ -40,6 +95,12 @@ public static class WeatherApiUrls
            $"&hourly=uv_index,pm10,pm2_5,us_aqi";
 
     public static string Current(float lat, float lon)
-        => Forecast(lat, lon, hourly: HourlyVars, daily: "", forecastDays: 1);
-
+        => Forecast(
+            lat,
+            lon,
+            current: CurrentVars,
+            hourly: HourlyVars,
+            daily: "",
+            forecastDays: 1
+        );
 }
