@@ -46,7 +46,7 @@ public class InspirationCommandHandler(
                 _ = await _botClient.SendMessage(
                     chatId,
                     "Use the format:\n`/inspiration create your inspiration text`\n\nYou can also try `/inspiration list` to view saved inspirations ✨",
-                    parseMode: ParseMode.Markdown
+                    parseMode: ParseMode.MarkdownV2
                 );
                 return;
             }

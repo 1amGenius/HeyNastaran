@@ -50,7 +50,7 @@ $@"🌤 *Weather at your location*
 Condition: *{cw.Condition}* {cw.Icon}
 ";
 
-            _ = await _botClient.SendMessage(chatId, msg, parseMode: ParseMode.Markdown);
+            _ = await _botClient.SendMessage(chatId, msg, parseMode: ParseMode.MarkdownV2);
 
             _ = await _botClient.SendMessage(chatId, "Done ✔", replyMarkup: new ReplyKeyboardRemove());
         }

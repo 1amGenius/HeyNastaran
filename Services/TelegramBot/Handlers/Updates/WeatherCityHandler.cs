@@ -47,7 +47,7 @@ public class WeatherCityHandler(
 
             if (parts.Length < 2)
             {
-                _ = await _botClient.SendMessage(chatId, "Bruh you gotta type a city too 😭\nTry: `/weather London`", ParseMode.Markdown);
+                _ = await _botClient.SendMessage(chatId, "Bruh you gotta type a city too 😭\nTry: `/weather London`", ParseMode.MarkdownV2);
                 return;
             }
 
@@ -72,7 +72,7 @@ public class WeatherCityHandler(
 Condition: *{cw.Condition}* {cw.Icon}
 ";
 
-            _ = await _botClient.SendMessage(chatId, msg, ParseMode.Markdown);
+            _ = await _botClient.SendMessage(chatId, msg, ParseMode.MarkdownV2);
         }
         catch (Exception ex)
         {

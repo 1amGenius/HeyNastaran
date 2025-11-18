@@ -46,7 +46,7 @@ public class IdeaCommandHandler(
                 _ = await _botClient.SendMessage(
                     chatId,
                     "Use the format:\n`/idea create your idea text`\n\nYou can also try `/idea list` to view saved ideas 💡",
-                    parseMode: ParseMode.Markdown
+                    parseMode: ParseMode.MarkdownV2
                 );
                 return;
             }
@@ -73,7 +73,7 @@ public class IdeaCommandHandler(
                     if (ideas.Any())
                     {
                         string text = string.Join("\n\n", ideas.Select(i => $"💭 *{i.Label ?? "idea"}*: {i.Content}"));
-                        _ = await _botClient.SendMessage(chatId, text, parseMode: ParseMode.Markdown);
+                        _ = await _botClient.SendMessage(chatId, text, parseMode: ParseMode.MarkdownV2);
                     }
                     else
                       {

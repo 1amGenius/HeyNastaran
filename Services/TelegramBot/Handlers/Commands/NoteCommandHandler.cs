@@ -34,7 +34,7 @@ public class NoteCommandHandler(
                 _ = await _botClient.SendMessage(
                     chatId,
                     "Use the format:\n`/note create your note text`\n\nYou can also try `/note list` to view your saved notes 📝",
-                    parseMode: ParseMode.Markdown
+                    parseMode: ParseMode.MarkdownV2
                 );
                 return;
             }
