@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿
+using MongoDB.Driver;
 
 using Nastaran_bot.Repositories.DailyNote;
 using Nastaran_bot.Repositories.Idea;
@@ -81,6 +82,7 @@ builder.Services.AddScoped<ICommandHandler, NoteCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, IdeaCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, InspirationCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, WeatherCommandHandler>();
+builder.Services.AddScoped<ICommandHandler, StartCommandHandler>();
 
 // UPDATE handlers
 builder.Services.AddScoped<IUpdateHandler, WeatherCityHandler>();
@@ -123,7 +125,7 @@ if (!app.Environment.IsDevelopment())
     _ = app.UseHttpsRedirection();
 }
 
-//app.Urls.Add("http://0.0.0.0:8080");
+app.Urls.Add("http://0.0.0.0:8080");
 
 app.UseAuthentication();
 app.UseAuthorization();
