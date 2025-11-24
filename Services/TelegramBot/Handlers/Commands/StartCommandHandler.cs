@@ -28,29 +28,38 @@ public class StartCommandHandler(
         }
 
         long telegramId = update.Message.From.Id;
+        long chatId = update.Message.Chat.Id;
+
         string username = update.Message.Chat.Username ?? string.Empty;
         string firstName = update.Message.Chat.FirstName ?? "Nastaran";
 
         try
         {
             Models.User existingUser = await _userService.GetUserByTelegramIdAsync(telegramId);
+
             if (existingUser != null)
             {
-                _ = await _botClient.SendMessage(update.Message.Chat.Id, $"Welcome back, {firstName}! 🎉");
+                _ = await _botClient.SendMessage(chatId, $"Welcome back, {firstName}! 🎉");
                 return;
             }
 
-            Models.User newUser = await _userService.AddUserAsync(telegramId, username, firstName, "UTC");
+            _ = await _userService.AddUserAsync(telegramId, username, firstName, "UTC");
 
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
-                new KeyboardButton[] { "🎵 Daily Music" },
-                ["💬 Daily Quote"],
-                ["🌤 Weather Updates"]
+                new KeyboardButton[] { "🎵 Songs" },
+                ["💬 Quotes"],
+                ["🌤 Weathers"],
+                ["📝 Note"],
+                ["💡 Inspirations"],
+                ["⚙ Settings"],
+                ["❓ Help"]
             })
             {
                 ResizeKeyboard = true,
-                OneTimeKeyboard = false
+                OneTimeKeyboard = false,
+                IsPersistent = true,
+                InputFieldPlaceholder = "Choose an option..."
             };
 
             string welcomeMessage =
@@ -60,12 +69,14 @@ I'm your personal bot.
 You can get daily music, quotes, and weather updates right here.
 Use the keyboard below to get started:";
 
-            _ = await _botClient.SendMessage(update.Message.Chat.Id, welcomeMessage, replyMarkup: keyboard);
+            _ = await _botClient.SendMessage(chatId, welcomeMessage, replyMarkup: keyboard);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error handling /start command for chatId {ChatId}", update.Message.Chat.Id);
-            _ = await _botClient.SendMessage(update.Message.Chat.Id, "⚠️ Something went wrong while setting up your account.");
+            _logger.LogError(ex, "Error handling /start for TelegramId {TelegramId}", telegramId);
+
+            _ = await _botClient.SendMessage(chatId,
+                "⚠️ Something went wrong while setting up your account.");
         }
     }
 }
