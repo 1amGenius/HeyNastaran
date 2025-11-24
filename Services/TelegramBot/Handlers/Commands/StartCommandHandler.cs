@@ -1,5 +1,6 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
 using Nastaran_bot.Services.User;
+using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -47,13 +48,14 @@ public class StartCommandHandler(
 
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
-                new KeyboardButton[] { "🎵 Songs" },
-                ["💬 Quotes"],
-                ["🌤 Weathers"],
-                ["📝 Note"],
-                ["💡 Inspirations"],
-                ["⚙ Settings"],
-                ["❓ Help"]
+                new KeyboardButton[] { BotButtons.Texts.Songs },
+                [BotButtons.Texts.Quotes],
+                [BotButtons.Texts.Weather],
+                [BotButtons.Texts.Notes],
+                [BotButtons.Texts.Ideas],
+                [BotButtons.Texts.Inspirations],
+                [BotButtons.Texts.Settings],
+                [BotButtons.Texts.Help]
             })
             {
                 ResizeKeyboard = true,

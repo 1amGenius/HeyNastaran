@@ -1,5 +1,6 @@
 ﻿using Nastaran_bot.Services.Idea;
 using Nastaran_bot.Services.TelegramBot.Interfaces;
+using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -17,7 +18,7 @@ public class IdeaCommandHandler(
     private readonly IIdeaService _ideaService = ideaService;
     private readonly ILogger<IdeaCommandHandler> _logger = logger;
 
-    public string Command => "/idea";
+    public string Command => BotButtons.Commands.Ideas;
 
     public async Task HandleAsync(Update update)
     {

@@ -1,4 +1,5 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
+using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -15,7 +16,7 @@ public class WeatherCommandHandler(
     private readonly ITelegramBotClient _botClient = botClient;
     private readonly ILogger<WeatherCommandHandler> _logger = logger;
 
-    public string Command => "/weather";
+    public string Command => BotButtons.WeatherText;
 
     public async Task HandleAsync(Update update)
     {

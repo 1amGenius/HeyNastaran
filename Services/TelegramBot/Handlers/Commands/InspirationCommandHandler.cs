@@ -1,5 +1,6 @@
 ﻿using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot.Interfaces;
+using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -17,7 +18,7 @@ public class InspirationCommandHandler(
     private readonly IInspirationService _inspirationService = inspirationService;
     private readonly ILogger<InspirationCommandHandler> _logger = logger;
 
-    public string Command => "/inspiration";
+    public string Command => BotButtons.Commands.Inspirations;
 
     public async Task HandleAsync(Update update)
     {

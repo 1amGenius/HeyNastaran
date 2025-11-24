@@ -1,7 +1,9 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Routing;
+using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace Nastaran_bot.Services.TelegramBot;
 
@@ -28,18 +30,40 @@ public class TelegramBotService(
         if (update.Message.Location != null)
         {
             await _updateRouter.RouteAsync(update);
+            return;
         }
-        else if (!string.IsNullOrWhiteSpace(messageText) && messageText.StartsWith("/"))
+
+        bool handled;
+
+        if (!string.IsNullOrWhiteSpace(messageText) && messageText.StartsWith(char.Parse("/")))
         {
-            bool handled = await _commandRouter.RouteAsync(update);
-            if (!handled)
+            handled = await _commandRouter.RouteAsync(update);
+        }
+        else if (!string.IsNullOrWhiteSpace(messageText) &&
+                 BotButtons.ButtonToCommand.TryGetValue(messageText, out string command))
+        {
+            var syntheticUpdate = new Update
             {
-                _ = await _botClient.SendMessage(chatId, "Sorry, I don’t recognize that command 😅");
-            }
+                Id = update.Id,
+                Message = new Message
+                {
+                    Chat = update.Message.Chat,
+                    From = update.Message.From,
+                    Text = command
+                }
+            };
+
+            handled = await _commandRouter.RouteAsync(syntheticUpdate);
         }
         else
         {
-            _ = await _botClient.SendMessage(chatId, "Send a command or share your location 🌤");
+            await _updateRouter.RouteAsync(update);
+            handled = true;
+        }
+
+        if (!handled)
+        {
+            _ = await _botClient.SendMessage(chatId, "Send a command, click a button, or share your location 🌤");
         }
     }
 }

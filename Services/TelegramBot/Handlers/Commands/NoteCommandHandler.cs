@@ -1,4 +1,5 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
+using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -14,7 +15,7 @@ public class NoteCommandHandler(
     private readonly ITelegramBotClient _botClient = botClient;
     private readonly ILogger<NoteCommandHandler> _logger = logger;
 
-    public string Command => "/note";
+    public string Command => BotButtons.Commands.Notes;
 
     public async Task HandleAsync(Update update)
     {
