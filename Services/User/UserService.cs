@@ -40,37 +40,29 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
         }
     }
 
-    public async Task<IEnumerable<Models.User>> GetUsersAsync(
-        long? telegramId = null,
-        int? page = null,
-        int? pageSize = null)
-    {
-        try
-        {
-            if (telegramId.HasValue)
-            {
-                return await _userRepository.GetByTelegramIdAsync(telegramId.Value);
-            }
-
-            IEnumerable<Models.User> all = await _userRepository.GetAllAsync();
-            return page.HasValue && pageSize.HasValue ? all.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value) : all;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching users");
-            return [];
-        }
-    }
-
     public async Task<Models.User> GetUserByIdAsync(string id)
     {
         try
         {
-            return await _userRepository.GetByIdAsync(id);
+            return await _userRepository.FindByIdAsync(id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting user {id}", id);
+            return null;
+        }
+    }
+
+    public async Task<Models.User> GetUserByTelegramIdAsync(long telegramId)
+    {
+        try
+        {
+            IEnumerable<Models.User> users = await _userRepository.FindByTelegramIdAsync(telegramId);
+            return users.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting user by TelegramId {telegramId}", telegramId);
             return null;
         }
     }
@@ -92,7 +84,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
     {
         try
         {
-            Models.User user = await _userRepository.GetByIdAsync(id);
+            Models.User user = await _userRepository.FindByIdAsync(id);
             if (user == null)
             {
                 return null;
@@ -153,7 +145,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
     public async Task<Models.User> UpdateLocationAsync(string id, LocationDto location)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -174,7 +166,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
     public async Task<Models.User> UpdateTimezoneAsync(string id, string timezone)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -190,7 +182,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
     public async Task<Models.User> UpdatePreferencesAsync(string id, PreferencesDto prefs)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -208,7 +200,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
     public async Task<Models.User> AddFavoriteArtistAsync(string id, string artist)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -228,7 +220,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
     public async Task<Models.User> RemoveFavoriteArtistAsync(string id, string artist)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -245,7 +237,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
     public async Task<Models.User> ReplaceFavoriteArtistsAsync(string id, IEnumerable<string> artists)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -264,7 +256,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
         DateTime? spotify = null,
         DateTime? weather = null)
     {
-        Models.User user = await _userRepository.GetByIdAsync(id);
+        Models.User user = await _userRepository.FindByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -284,67 +276,5 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
         await _userRepository.UpdateAsync(user);
         return user;
-    }
-
-    // todo: move to repository-level filters to improve speed later
-    public async Task<IEnumerable<Models.User>> GetUsersForNotificationAsync(
-        string notificationType,
-        string timezone = null,
-        int? limit = null)
-    {
-        IEnumerable<Models.User> all = await _userRepository.GetAllAsync();
-        IEnumerable<Models.User> filtered = notificationType switch
-        {
-            "DailyMusic" => all.Where(u => u.Preferences?.DailyMusic ?? false),
-            "DailyQuote" => all.Where(u => u.Preferences?.DailyQuote ?? false),
-            "WeatherUpdates" => all.Where(u => u.Preferences?.WeatherUpdates ?? false),
-            _ => []
-        };
-
-        if (!string.IsNullOrEmpty(timezone))
-        {
-            filtered = filtered.Where(u => string.Equals(u.Timezone, timezone, StringComparison.OrdinalIgnoreCase));
-        }
-
-        if (limit.HasValue)
-        {
-            filtered = filtered.Take(limit.Value);
-        }
-
-        return filtered;
-    }
-
-    public async Task<IEnumerable<Models.User>> GetUsersNeedingSpotifyCheckAsync(TimeSpan threshold, int? limit = null)
-    {
-        IEnumerable<Models.User> all = await _userRepository.GetAllAsync();
-
-        DateTime cutoff = DateTime.UtcNow - threshold;
-
-        IEnumerable<Models.User> filtered = all.Where(u => u.Preferences?.DailyMusic ?? false)
-            .Where(u => u.LastCheck?.Spotify == DateTime.MinValue || u.LastCheck.Spotify <= cutoff);
-
-        if (limit.HasValue)
-        {
-            filtered = filtered.Take(limit.Value);
-        }
-
-        return filtered;
-    }
-
-    public async Task<IEnumerable<Models.User>> GetUsersNeedingWeatherCheckAsync(TimeSpan threshold, int? limit = null)
-    {
-        IEnumerable<Models.User> all = await _userRepository.GetAllAsync();
-
-        DateTime cutoff = DateTime.UtcNow - threshold;
-
-        IEnumerable<Models.User> filtered = all.Where(u => u.Preferences?.WeatherUpdates ?? false)
-            .Where(u => u.LastCheck?.Weather == DateTime.MinValue || u.LastCheck.Weather <= cutoff);
-
-        if (limit.HasValue)
-        {
-            filtered = filtered.Take(limit.Value);
-        }
-
-        return filtered;
     }
 }

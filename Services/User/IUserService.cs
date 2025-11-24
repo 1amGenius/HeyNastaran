@@ -4,6 +4,10 @@ namespace Nastaran_bot.Services.User;
 
 public interface IUserService
 {
+    // ───────────────────────────────────────────────
+    // Create / Get / Delete
+    // ───────────────────────────────────────────────
+
     public Task<Models.User> AddUserAsync(
         long telegramId,
         string username,
@@ -11,17 +15,16 @@ public interface IUserService
         string timezone = "UTC"
     );
 
-    public Task<IEnumerable<Models.User>> GetUsersAsync(
-        long? telegramId = null,
-        int? page = null,
-        int? pageSize = null
-    );
+    public Task<Models.User> GetUserByTelegramIdAsync(long telegramId);
 
     public Task<Models.User> GetUserByIdAsync(string id);
 
     public Task<bool> DeleteUserAsync(string id);
 
-    // Updates
+    // ───────────────────────────────────────────────
+    // Updates (used directly by command handlers)
+    // ───────────────────────────────────────────────
+
     public Task<Models.User> UpdateUserAsync(string id, UserUpdateDto update);
 
     public Task<Models.User> UpdateLocationAsync(string id, LocationDto location);
@@ -30,27 +33,23 @@ public interface IUserService
 
     public Task<Models.User> UpdatePreferencesAsync(string id, PreferencesDto prefs);
 
+    // ───────────────────────────────────────────────
+    // Favorite artists (used in Telegram commands)
+    // ───────────────────────────────────────────────
+
     public Task<Models.User> AddFavoriteArtistAsync(string id, string artist);
 
     public Task<Models.User> RemoveFavoriteArtistAsync(string id, string artist);
 
     public Task<Models.User> ReplaceFavoriteArtistsAsync(string id, IEnumerable<string> artists);
 
-    // LastCheck
+    // ───────────────────────────────────────────────
+    // Last checks (used by scheduled jobs or bot logic)
+    // ───────────────────────────────────────────────
+
     public Task<Models.User> SetLastCheckAsync(
         string id,
         DateTime? spotify = null,
         DateTime? weather = null
     );
-
-    // Notification queries
-    public Task<IEnumerable<Models.User>> GetUsersForNotificationAsync(
-        string notificationType, // "DailyMusic" | "DailyQuote" | "WeatherUpdates"
-        string timezone = null,
-        int? limit = null
-    );
-
-    // helpers
-    public Task<IEnumerable<Models.User>> GetUsersNeedingSpotifyCheckAsync(TimeSpan threshold, int? limit = null);
-    public Task<IEnumerable<Models.User>> GetUsersNeedingWeatherCheckAsync(TimeSpan threshold, int? limit = null);
 }

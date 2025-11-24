@@ -39,16 +39,16 @@ public class UserRepository : IUserRepository
         return await _users.AsQueryable().Where(filter).ToListAsync();
     }
 
-    public async Task<IEnumerable<Models.User>> GetAllAsync()
+    public async Task<IEnumerable<Models.User>> FindAllAsync()
         => await _users.Find(_ => true).ToListAsync();
 
-    public async Task<Models.User> GetByIdAsync(string id)
+    public async Task<Models.User> FindByIdAsync(string id)
     {
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(n => n.Id, id);
         return await _users.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Models.User>> GetByTelegramIdAsync(long telegramId)
+    public async Task<IEnumerable<Models.User>> FindByTelegramIdAsync(long telegramId)
     {
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq("telegramId", telegramId);
         return await _users.Find(filter).ToListAsync();

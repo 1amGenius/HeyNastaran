@@ -41,7 +41,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
     {
         try
         {
-            return await _dailyNoteRepository.GetByTelegramIdAsync(telegramId);
+            return await _dailyNoteRepository.FindByTelegramIdAsync(telegramId);
         }
         catch (Exception ex)
         {
@@ -67,7 +67,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
     {
         try
         {
-            return await _dailyNoteRepository.GetByIdAsync(id);
+            return await _dailyNoteRepository.FindByIdAsync(id);
         }
         catch (Exception ex)
         {

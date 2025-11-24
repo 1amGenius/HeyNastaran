@@ -39,16 +39,16 @@ public class DailyNoteRepository : IDailyNoteRepository
         return await _dailyNotes.AsQueryable().Where(filter).ToListAsync();
     }
 
-    public async Task<IEnumerable<Models.DailyNote>> GetAllAsync()
+    public async Task<IEnumerable<Models.DailyNote>> FindAllAsync()
         => await _dailyNotes.Find(_ => true).ToListAsync();
 
-    public async Task<Models.DailyNote> GetByIdAsync(string id)
+    public async Task<Models.DailyNote> FindByIdAsync(string id)
     {
         FilterDefinition<Models.DailyNote> filter = Builders<Models.DailyNote>.Filter.Eq(n => n.Id, id);
         return await _dailyNotes.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Models.DailyNote>> GetByTelegramIdAsync(long telegramId)
+    public async Task<IEnumerable<Models.DailyNote>> FindByTelegramIdAsync(long telegramId)
     {
         FilterDefinition<Models.DailyNote> filter = Builders<Models.DailyNote>.Filter.Eq("telegramId", telegramId);
         return await _dailyNotes.Find(filter).ToListAsync();

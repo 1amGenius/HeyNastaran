@@ -39,16 +39,16 @@ public class InspirationRepository : IInspirationRepository
         return await _inspirations.AsQueryable().Where(filter).ToListAsync();
     }
 
-    public async Task<IEnumerable<Models.Inspiration>> GetAllAsync()
+    public async Task<IEnumerable<Models.Inspiration>> FindAllAsync()
         => await _inspirations.Find(_ => true).ToListAsync();
 
-    public async Task<Models.Inspiration> GetByIdAsync(string id)
+    public async Task<Models.Inspiration> FindByIdAsync(string id)
     {
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(n => n.Id, id);
         return await _inspirations.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Models.Inspiration>> GetByTelegramIdAsync(long telegramId)
+    public async Task<IEnumerable<Models.Inspiration>> FindByTelegramIdAsync(long telegramId)
     {
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq("telegramId", telegramId);
         return await _inspirations.Find(filter).ToListAsync();

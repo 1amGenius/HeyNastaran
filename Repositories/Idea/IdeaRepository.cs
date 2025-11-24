@@ -39,16 +39,16 @@ public class IdeaRepository : IIdeaRepository
         return await _ideas.AsQueryable().Where(filter).ToListAsync();
     }
 
-    public async Task<IEnumerable<Models.Idea>> GetAllAsync()
+    public async Task<IEnumerable<Models.Idea>> FindAllAsync()
         => await _ideas.Find(_ => true).ToListAsync();
 
-    public async Task<Models.Idea> GetByIdAsync(string id)
+    public async Task<Models.Idea> FindByIdAsync(string id)
     {
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(n => n.Id, id);
         return await _ideas.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Models.Idea>> GetByTelegramIdAsync(long telegramId)
+    public async Task<IEnumerable<Models.Idea>> FindByTelegramIdAsync(long telegramId)
     {
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq("telegramId", telegramId);
         return await _ideas.Find(filter).ToListAsync();

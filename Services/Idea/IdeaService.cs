@@ -41,7 +41,7 @@ public class IdeaService(IIdeaRepository ideaRepository, ILogger<IdeaService> lo
     {
         try
         {
-            return await _ideaRepository.GetByTelegramIdAsync(telegramId);
+            return await _ideaRepository.FindByTelegramIdAsync(telegramId);
         }
         catch (Exception ex)
         {
@@ -67,7 +67,7 @@ public class IdeaService(IIdeaRepository ideaRepository, ILogger<IdeaService> lo
     {
         try
         {
-            return await _ideaRepository.GetByIdAsync(id);
+            return await _ideaRepository.FindByIdAsync(id);
         }
         catch (Exception ex)
         {

@@ -33,8 +33,8 @@ public class StartCommandHandler(
 
         try
         {
-            IEnumerable<Models.User> existingUsers = await _userService.GetUsersAsync(telegramId);
-            if (existingUsers.Any())
+            Models.User existingUser = await _userService.GetUserByTelegramIdAsync(telegramId);
+            if (existingUser != null)
             {
                 _ = await _botClient.SendMessage(update.Message.Chat.Id, $"Welcome back, {firstName}! 🎉");
                 return;

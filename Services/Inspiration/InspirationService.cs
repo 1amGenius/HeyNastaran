@@ -43,7 +43,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
     {
         try
         {
-            return await _inspirationRepository.GetByTelegramIdAsync(telegramId);
+            return await _inspirationRepository.FindByTelegramIdAsync(telegramId);
         }
         catch (Exception ex)
         {
@@ -69,7 +69,7 @@ public class InspirationService(IInspirationRepository inspirationRepository, IL
     {
         try
         {
-            return await _inspirationRepository.GetByIdAsync(id);
+            return await _inspirationRepository.FindByIdAsync(id);
         }
         catch (Exception ex)
         {
