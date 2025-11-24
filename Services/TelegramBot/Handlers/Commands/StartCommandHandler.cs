@@ -1,5 +1,4 @@
-﻿using Nastaran_bot.Repositories.User;
-using Nastaran_bot.Services.TelegramBot.Interfaces;
+﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
 using Nastaran_bot.Services.User;
 
 using Telegram.Bot;

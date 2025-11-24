@@ -1,6 +1,4 @@
-﻿using System.Reflection.Emit;
-
-using Nastaran_bot.Contracts.User;
+﻿using Nastaran_bot.Contracts.User;
 using Nastaran_bot.Repositories.User;
 
 namespace Nastaran_bot.Services.User;
@@ -125,7 +123,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
                     Lon = update.Location.Lon
                 };
             }
-            
+
             if (update.Preferences != null)
             {
                 user.Preferences = new Models.Preferences
@@ -142,7 +140,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             }
 
             user.UpdatedAt = DateTime.UtcNow;
-            
+
             await _userRepository.UpdateAsync(user);
             return user;
         }
@@ -183,9 +181,9 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
         }
 
         user.Timezone = timezone;
-     
+
         user.UpdatedAt = DateTime.UtcNow;
-        
+
         await _userRepository.UpdateAsync(user);
         return user;
     }
@@ -203,7 +201,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
         user.Preferences.WeatherUpdates = prefs.WeatherUpdates ?? user.Preferences.WeatherUpdates;
 
         user.UpdatedAt = DateTime.UtcNow;
-     
+
         await _userRepository.UpdateAsync(user);
         return user;
     }
@@ -254,9 +252,9 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
         }
 
         user.FavoriteArtists = [.. artists];
-        
+
         user.UpdatedAt = DateTime.UtcNow;
-        
+
         await _userRepository.UpdateAsync(user);
         return user;
     }
@@ -283,7 +281,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
         }
 
         user.UpdatedAt = DateTime.UtcNow;
-        
+
         await _userRepository.UpdateAsync(user);
         return user;
     }
@@ -319,9 +317,9 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
     public async Task<IEnumerable<Models.User>> GetUsersNeedingSpotifyCheckAsync(TimeSpan threshold, int? limit = null)
     {
         IEnumerable<Models.User> all = await _userRepository.GetAllAsync();
-        
+
         DateTime cutoff = DateTime.UtcNow - threshold;
-        
+
         IEnumerable<Models.User> filtered = all.Where(u => u.Preferences?.DailyMusic ?? false)
             .Where(u => u.LastCheck?.Spotify == DateTime.MinValue || u.LastCheck.Spotify <= cutoff);
 
@@ -336,9 +334,9 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
     public async Task<IEnumerable<Models.User>> GetUsersNeedingWeatherCheckAsync(TimeSpan threshold, int? limit = null)
     {
         IEnumerable<Models.User> all = await _userRepository.GetAllAsync();
-        
+
         DateTime cutoff = DateTime.UtcNow - threshold;
-        
+
         IEnumerable<Models.User> filtered = all.Where(u => u.Preferences?.WeatherUpdates ?? false)
             .Where(u => u.LastCheck?.Weather == DateTime.MinValue || u.LastCheck.Weather <= cutoff);
 

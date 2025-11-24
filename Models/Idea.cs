@@ -7,7 +7,7 @@ public class Idea
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id 
+    public string Id
     {
         get;
         set;
@@ -21,44 +21,44 @@ public class Idea
     }
 
     [BsonElement("label")]
-    public string Label 
+    public string Label
     {
         get;
         set;
     } = string.Empty;
 
     [BsonElement("content")]
-    public string Content 
+    public string Content
     {
         get;
-        set; 
+        set;
     } = string.Empty;
 
     [BsonElement("tags")]
-    public List<string> Tags 
+    public List<string> Tags
     {
         get;
         set;
     } = [];
 
     [BsonElement("createdAt")]
-    public DateTime CreatedAt 
+    public DateTime CreatedAt
     {
         get;
         set;
     } = DateTime.UtcNow;
 
     [BsonElement("updatedAt")]
-    public DateTime UpdatedAt 
-    { 
-        get; 
-        set; 
+    public DateTime UpdatedAt
+    {
+        get;
+        set;
     } = DateTime.UtcNow;
 
     [BsonElement("favorite")]
-    public bool Favorite 
-    { 
+    public bool Favorite
+    {
         get;
-        set; 
+        set;
     } = false;
 }

@@ -1,6 +1,5 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
 
-using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace Nastaran_bot.Services.TelegramBot.Routing;

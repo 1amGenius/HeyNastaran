@@ -76,7 +76,7 @@ public class IdeaCommandHandler(
                         _ = await _botClient.SendMessage(chatId, text, parseMode: ParseMode.MarkdownV2);
                     }
                     else
-                      {
+                    {
                         _ = await _botClient.SendMessage(chatId, "You haven’t saved any ideas yet 🤔");
                     }
 

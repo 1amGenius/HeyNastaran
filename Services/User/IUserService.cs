@@ -16,9 +16,9 @@ public interface IUserService
         int? page = null,
         int? pageSize = null
     );
-    
+
     public Task<Models.User> GetUserByIdAsync(string id);
-    
+
     public Task<bool> DeleteUserAsync(string id);
 
     // Updates

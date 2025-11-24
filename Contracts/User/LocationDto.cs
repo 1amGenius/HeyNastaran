@@ -2,18 +2,18 @@
 
 public class LocationDto
 {
-    public string City 
+    public string City
     {
         get;
         set;
     } = string.Empty;
-    
-    public string Country 
-    { 
-        get; 
+
+    public string Country
+    {
+        get;
         set;
     } = string.Empty;
-    
+
     public double Lat
     {
         get;
@@ -22,7 +22,7 @@ public class LocationDto
 
     public double Lon
     {
-        get; 
+        get;
         set;
     }
 }

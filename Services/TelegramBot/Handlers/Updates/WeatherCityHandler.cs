@@ -1,8 +1,6 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
 using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
-using OpenMeteo.Geocoding;
-
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -54,7 +52,7 @@ public class WeatherCityHandler(
             string city = string.Join(' ', parts.Skip(1)).Trim();
 
             (float latitude, float longitude) = await _weatherApi.GetCoordinatesByCityNameAsync(city);
-            
+
             Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(latitude, longitude);
             Models.CurrentWeather cw = weather.Current;
 

@@ -1,6 +1,5 @@
 ﻿using Nastaran_bot.Models;
 using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
-using Nastaran_bot.Utils.Mapper;
 using Nastaran_bot.Utils.Urls;
 
 using OpenMeteo.Geocoding;

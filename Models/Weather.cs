@@ -20,25 +20,25 @@ public class Weather
         set;
     }
 
-    public CurrentWeather Current 
-    { 
+    public CurrentWeather Current
+    {
         get;
-        set; 
+        set;
     } = new();
 
-    public List<HourlyForecast> Hourly 
-    { 
+    public List<HourlyForecast> Hourly
+    {
         get;
         set;
     } = [];
 
-    public List<DailyForecast> Daily 
-    { 
+    public List<DailyForecast> Daily
+    {
         get;
         set;
     } = [];
 
-    public override string ToString() 
+    public override string ToString()
         => $"{Current.Icon} {Current.Condition}\n" +
                $"🌡 Temp: {Current.TemperatureC:F1}°C (Feels like {Current.FeelsLikeC:F1}°C)\n" +
                $"💨 Wind: {Current.WindSpeedKph:F1} km/h\n" +
@@ -73,18 +73,18 @@ public class CurrentWeather
         set;
     }
 
-    public string Condition 
-    { 
+    public string Condition
+    {
         get;
-        set; 
+        set;
     } = string.Empty;
-    
-    public string Icon 
-    { 
+
+    public string Icon
+    {
         get;
         set;
     } = "🌤";
-    
+
     public float? UvIndex
     {
         get;
@@ -96,7 +96,7 @@ public class CurrentWeather
         get;
         set;
     }
-    
+
     public float? CloudCover
     {
         get;
@@ -126,7 +126,7 @@ public class HourlyForecast
 
     public float WindSpeedKph
     {
-        get; 
+        get;
         set;
     }
 
@@ -148,15 +148,15 @@ public class HourlyForecast
         set;
     }
 
-    public string Condition 
-    { 
-        get; 
+    public string Condition
+    {
+        get;
         set;
     } = string.Empty;
-    
-    public string Icon 
-    { 
-        get; 
+
+    public string Icon
+    {
+        get;
         set;
     } = "🌤";
 
@@ -177,7 +177,7 @@ public class DailyForecast
 
     public float TemperatureMinC
     {
-        get; 
+        get;
         set;
     }
 
@@ -189,7 +189,7 @@ public class DailyForecast
 
     public DateTime Sunrise
     {
-        get; 
+        get;
         set;
     }
 
@@ -217,13 +217,13 @@ public class DailyForecast
         set;
     }
 
-    public string Condition 
-    { 
+    public string Condition
+    {
         get;
         set;
     } = string.Empty;
-    
-    public string Icon 
+
+    public string Icon
     {
         get;
         set;

@@ -1,4 +1,4 @@
-﻿namespace Nastaran_bot.Utils.Mapper;
+﻿namespace Nastaran_bot.Utils.Mappers;
 
 using OpenMeteo.Weather.ResponseModel;
 
@@ -129,10 +129,10 @@ public static class WeatherMapper
     // ========================
     // Hourly / Forecast Mapping
     // ========================
-    public static string MapCondition(float precipitation, int cloudCover, bool isDay = true) 
+    public static string MapCondition(float precipitation, int cloudCover, bool isDay = true)
         => MapConditionInternal(precipitation, cloudCover, isDay);
 
-    public static string MapIcon(float precipitation, int cloudCover, bool isDay = true) 
+    public static string MapIcon(float precipitation, int cloudCover, bool isDay = true)
         => MapIconInternal(precipitation, cloudCover, isDay);
 
     // ========================

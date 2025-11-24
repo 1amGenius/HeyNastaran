@@ -8,27 +8,27 @@ public sealed class UserCreateDto
         set;
     }
 
-    public string Username 
-    { 
-        get; 
-        set; 
-    } = string.Empty;
-    
-    public string FirstName 
+    public string Username
     {
         get;
         set;
     } = string.Empty;
-    
-    public string Timezone 
+
+    public string FirstName
+    {
+        get;
+        set;
+    } = string.Empty;
+
+    public string Timezone
     {
         get;
         set;
     } = "UTC";
-    
-    public LocationDto Location 
+
+    public LocationDto Location
     {
         get;
-        set; 
+        set;
     } = null;
 }

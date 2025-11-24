@@ -4,7 +4,7 @@ public class UserUpdateDto
 {
     public string Username
     {
-        get; 
+        get;
         set;
     }
 
@@ -13,28 +13,28 @@ public class UserUpdateDto
         get;
         set;
     }
-    
+
     public string Timezone
     {
-        get; 
+        get;
         set;
     }
-    
+
     public LocationDto Location
     {
         get;
         set;
     }
-    
+
     public PreferencesDto Preferences
     {
         get;
         set;
     }
-    
+
     public List<string> FavoriteArtists
     {
-        get; 
+        get;
         set;
     }
 }

@@ -13,7 +13,7 @@ public class PreferencesDto
         get;
         set;
     }
-    
+
     public bool? WeatherUpdates
     {
         get;

@@ -1,5 +1,4 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
-using Nastaran_bot.Utils.Helpers.Weather;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -25,7 +24,7 @@ public class WeatherCommandHandler(
             string[] parts = update.Message!.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length > 1)
             {
-                return; 
+                return;
             }
 
             if (update.Type != UpdateType.Message || update.Message?.Text == null)

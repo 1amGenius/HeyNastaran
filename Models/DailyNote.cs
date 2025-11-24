@@ -7,7 +7,7 @@ public class DailyNote
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id 
+    public string Id
     {
         get;
         set;
@@ -21,30 +21,30 @@ public class DailyNote
     }
 
     [BsonElement("date")]
-    public string Date 
-    { 
+    public string Date
+    {
         get;
         set;
     } = string.Empty;
 
     [BsonElement("text")]
-    public string Text 
+    public string Text
     {
         get;
-        set; 
+        set;
     } = string.Empty;
 
     [BsonElement("category")]
-    public string Category 
+    public string Category
     {
         get;
         set;
     } = string.Empty;
 
     [BsonElement("author")]
-    public string Author 
+    public string Author
     {
-        get; 
+        get;
         set;
     } = "unknown";
 
@@ -56,14 +56,14 @@ public class DailyNote
     }
 
     [BsonElement("createdAt")]
-    public DateTime CreatedAt 
+    public DateTime CreatedAt
     {
         get;
         set;
     } = DateTime.UtcNow;
 
     [BsonElement("updatedAt")]
-    public DateTime UpdatedAt 
+    public DateTime UpdatedAt
     {
         get;
         set;

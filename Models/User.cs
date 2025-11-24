@@ -7,10 +7,10 @@ public class User
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id 
-    { 
+    public string Id
+    {
         get;
-        set; 
+        set;
     } = string.Empty;
 
     [BsonElement("telegramId")]
@@ -21,63 +21,63 @@ public class User
     }
 
     [BsonElement("username")]
-    public string Username 
+    public string Username
     {
-        get; 
+        get;
         set;
     } = string.Empty;
 
     [BsonElement("firstName")]
-    public string FirstName 
-    { 
-        get; 
+    public string FirstName
+    {
+        get;
         set;
     } = string.Empty;
 
     [BsonElement("location")]
-    public Location Location 
-    { 
+    public Location Location
+    {
         get;
         set;
     } = new();
 
     [BsonElement("timezone")]
-    public string Timezone 
-    { 
+    public string Timezone
+    {
         get;
         set;
     } = "UTC";
 
     [BsonElement("favoriteArtists")]
-    public List<string> FavoriteArtists 
+    public List<string> FavoriteArtists
     {
         get;
         set;
     } = [];
 
     [BsonElement("preferences")]
-    public Preferences Preferences 
-    { 
+    public Preferences Preferences
+    {
         get;
         set;
     } = new();
 
     [BsonElement("lastCheck")]
-    public LastCheck LastCheck 
+    public LastCheck LastCheck
     {
         get;
         set;
     } = new();
 
     [BsonElement("createdAt")]
-    public DateTime CreatedAt 
+    public DateTime CreatedAt
     {
         get;
         set;
     } = DateTime.UtcNow;
 
     [BsonElement("updatedAt")]
-    public DateTime UpdatedAt 
+    public DateTime UpdatedAt
     {
         get;
         set;
@@ -86,18 +86,18 @@ public class User
 
 public class Location
 {
-    public string City 
-    {
-        get; 
-        set;
-    } = string.Empty;
-    
-    public string Country 
+    public string City
     {
         get;
         set;
     } = string.Empty;
-    
+
+    public string Country
+    {
+        get;
+        set;
+    } = string.Empty;
+
     public double Lat
     {
         get;
@@ -113,19 +113,19 @@ public class Location
 
 public class Preferences
 {
-    public bool DailyMusic 
-    { 
-        get;
-        set;
-    } = true;
-    
-    public bool DailyQuote 
+    public bool DailyMusic
     {
         get;
         set;
     } = true;
-    
-    public bool WeatherUpdates 
+
+    public bool DailyQuote
+    {
+        get;
+        set;
+    } = true;
+
+    public bool WeatherUpdates
     {
         get;
         set;
@@ -134,13 +134,13 @@ public class Preferences
 
 public class LastCheck
 {
-    public DateTime Spotify 
+    public DateTime Spotify
     {
         get;
         set;
     } = DateTime.MinValue;
-    
-    public DateTime Weather 
+
+    public DateTime Weather
     {
         get;
         set;
