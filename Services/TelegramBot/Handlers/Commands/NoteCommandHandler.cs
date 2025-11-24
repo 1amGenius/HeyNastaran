@@ -42,27 +42,19 @@ public class NoteCommandHandler(
             string command = parts[1].ToLower();
             string content = parts.Length > 2 ? string.Join(' ', parts.Skip(2)) : "";
 
-            switch (command)
+            _ = command switch
             {
-                case "create":
-                    _ = await _botClient.SendMessage(
-                        chatId,
-                        $"📝 Note saved:\n\n{content}",
-                        ParseMode.Html
-                    );
-                    break;
-
-                case "list":
-                    _ = await _botClient.SendMessage(
-                        chatId,
-                        "Here are your recent notes (coming soon) 📔"
-                    );
-                    break;
-
-                default:
-                    _ = await _botClient.SendMessage(chatId, "Unknown note command 😅");
-                    break;
-            }
+                "create" => await _botClient.SendMessage(
+                                        chatId,
+                                        $"📝 Note saved:\n\n{content}",
+                                        ParseMode.Html
+                                    ),
+                "list" => await _botClient.SendMessage(
+                                        chatId,
+                                        "Here are your recent notes (coming soon) 📔"
+                                    ),
+                _ => await _botClient.SendMessage(chatId, "Unknown note command 😅"),
+            };
         }
         catch (Exception ex)
         {
