@@ -1,8 +1,12 @@
-﻿namespace Nastaran_bot.Utils.Helpers.Weather.Interfaces;
+﻿using Nastaran_bot.Contracts.Weather;
+
+namespace Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
 public interface IWeatherApiClient
 {
     public Task<(float Latitude, float Longitude)> GetCoordinatesByCityNameAsync(string cityName);
+
+    public Task<ReverseGeocodingResult> GetCityAndCountryByCoordinatesAsync(float latitude, float longitude);
 
     public Task<Models.Weather> GetCurrentWeatherAsync(float latitude, float longitude);
 

@@ -3,4 +3,9 @@
 public interface IWeatherHttpClient
 {
     public Task<T> GetAsync<T>(string url);
+    public HttpClient RawHttpClient
+    {
+        get;
+    }
 }
+

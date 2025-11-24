@@ -6,7 +6,11 @@ namespace Nastaran_bot.Utils.Helpers.Weather.Clients;
 
 public class WeatherHttpClient : IWeatherHttpClient
 {
-    private readonly HttpClient _http;
+    public HttpClient RawHttpClient
+    {
+        get;
+    }
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -14,15 +18,15 @@ public class WeatherHttpClient : IWeatherHttpClient
 
     public WeatherHttpClient(HttpClient http)
     {
-        _http = http;
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 WeatherBot/1.0");
+        RawHttpClient = http;
+        RawHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 NastaranBot/1.0");
     }
 
     public async Task<T> GetAsync<T>(string url)
     {
         try
         {
-            HttpResponseMessage response = await _http.GetAsync(url);
+            HttpResponseMessage response = await RawHttpClient.GetAsync(url);
             _ = response.EnsureSuccessStatusCode();
 
             await using Stream stream = await response.Content.ReadAsStreamAsync();

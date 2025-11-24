@@ -1,4 +1,7 @@
-﻿using Nastaran_bot.Models;
+﻿using System.Text.Json;
+
+using Nastaran_bot.Contracts.Weather;
+using Nastaran_bot.Models;
 using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 using Nastaran_bot.Utils.Mappers;
 using Nastaran_bot.Utils.Urls;
@@ -35,6 +38,55 @@ public class WeatherApiClient(IWeatherHttpClient httpClient, ILogger<WeatherApiC
         {
             _logger.LogError(ex, "Error fetching coordinates for city: {cityName}", cityName);
             throw;
+        }
+    }
+
+    // ======================================================
+    // REVERSE GEOCODING – GET CITY & COUNTRY FROM COORDS
+    // ======================================================
+    public async Task<ReverseGeocodingResult> GetCityAndCountryByCoordinatesAsync(float latitude, float longitude)
+    {
+        try
+        {
+            string url = WeatherApiUrls.ReverseGeocoding(latitude, longitude);
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "NastaranBot/1.0");
+
+            HttpResponseMessage response = await _httpClient.RawHttpClient.SendAsync(request);
+            _ = response.EnsureSuccessStatusCode();
+
+            string json = await response.Content.ReadAsStringAsync();
+
+            var doc = JsonDocument.Parse(json);
+            JsonElement root = doc.RootElement;
+
+            if (!root.TryGetProperty("address", out JsonElement addr))
+            {
+                return new ReverseGeocodingResult("", "");
+            }
+
+            string city =
+                addr.TryGetProperty("city", out JsonElement c1) ? c1.GetString() :
+                addr.TryGetProperty("town", out JsonElement c2) ? c2.GetString() :
+                addr.TryGetProperty("village", out JsonElement c3) ? c3.GetString() :
+                addr.TryGetProperty("municipality", out JsonElement c4) ? c4.GetString() :
+                "";
+
+            string country =
+                addr.TryGetProperty("country", out JsonElement ctry)
+                    ? ctry.GetString()
+                    : "";
+
+            return new ReverseGeocodingResult(city ?? "", country ?? "");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Reverse geocoding failed for lat {lat}, lon {lon}",
+                latitude, longitude);
+
+            return new ReverseGeocodingResult("", "");
         }
     }
 

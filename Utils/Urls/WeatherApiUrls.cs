@@ -103,4 +103,10 @@ public static class WeatherApiUrls
             daily: "",
             forecastDays: 1
         );
+
+    public static string ReverseGeocoding(float lat, float lon, string format = "json", int zoom = 10) 
+        => $"https://nominatim.openstreetmap.org/reverse" +
+           $"?format={format}&lat={lat}&lon={lon}" +
+           $"&zoom={zoom}&addressdetails=1";
+
 }
