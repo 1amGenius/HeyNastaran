@@ -10,7 +10,6 @@ using Nastaran_bot.Services.Idea;
 using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
 using Nastaran_bot.Services.TelegramBot.Handlers.Commands;
-using Nastaran_bot.Services.TelegramBot.Handlers.Updates;
 using Nastaran_bot.Services.TelegramBot.Interfaces;
 using Nastaran_bot.Services.TelegramBot.Routing;
 using Nastaran_bot.Services.User;
@@ -22,6 +21,11 @@ using Nastaran_bot.Utils.Helpers.Weather.Clients;
 using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
 using Telegram.Bot;
+using Nastaran_bot.Services.TelegramBot.Handlers.Commands.Idea;
+using Nastaran_bot.Services.TelegramBot.Handlers.Commands.Inspiration;
+using Nastaran_bot.Services.TelegramBot.Handlers.Commands.Note;
+using Nastaran_bot.Services.TelegramBot.Handlers.Commands.Weather;
+using Nastaran_bot.Services.TelegramBot.Handlers.Updates.Weather;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -85,8 +89,11 @@ builder.Services.AddScoped<ICommandHandler, WeatherCommandHandler>();
 builder.Services.AddScoped<ICommandHandler, StartCommandHandler>();
 
 // UPDATE handlers
+builder.Services.AddScoped<IUpdateHandler, WeatherCallbackHandler>();
 builder.Services.AddScoped<IUpdateHandler, WeatherCityHandler>();
 builder.Services.AddScoped<IUpdateHandler, WeatherLocationHandler>();
+builder.Services.AddScoped<IUpdateHandler, WeatherSearchCityHandler>();
+builder.Services.AddScoped<IUpdateHandler, WeatherSearchStartHandler>();
 
 // Routers
 builder.Services.AddScoped<CommandRouter>();
