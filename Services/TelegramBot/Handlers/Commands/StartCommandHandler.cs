@@ -50,7 +50,7 @@ public class StartCommandHandler(
             {
                 new KeyboardButton[] { BotButtons.Texts.Songs },
                 [BotButtons.Texts.Quotes], // daily, random, by category
-                [BotButtons.Texts.Weather], // current, weekly, daily, hourly
+                [BotButtons.Texts.Weather._], // current, weekly, daily, hourly
                 [BotButtons.Texts.Notes], //Daily, monthly, yearly
                 [BotButtons.Texts.Ideas], // things to achieve, to buy, to read
                 [BotButtons.Texts.Inspirations], // images, articles, everything that can be stored in mongo

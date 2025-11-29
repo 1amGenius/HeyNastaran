@@ -40,7 +40,7 @@ public class TelegramBotService(
             handled = await _commandRouter.RouteAsync(update);
         }
         else if (!string.IsNullOrWhiteSpace(messageText) &&
-                 BotButtons.ButtonToCommand.TryGetValue(messageText, out string command))
+                 BotButtons.GlobalButtonsToCommand.TryGetValue(messageText, out string command))
         {
             var syntheticUpdate = new Update
             {

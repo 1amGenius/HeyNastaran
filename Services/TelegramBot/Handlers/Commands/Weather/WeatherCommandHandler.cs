@@ -3,7 +3,6 @@ using Nastaran_bot.Utils;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Nastaran_bot.Services.TelegramBot.Handlers.Commands.Weather;
@@ -16,51 +15,43 @@ public class WeatherCommandHandler(
     private readonly ITelegramBotClient _botClient = botClient;
     private readonly ILogger<WeatherCommandHandler> _logger = logger;
 
-    public string Command => BotButtons.Texts.Weather;
+    public string Command => BotButtons.Texts.Weather._;
 
     public async Task HandleAsync(Update update)
     {
         try
         {
-            string[] parts = update.Message!.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length > 1)
+            long chatId = update.Message!.Chat.Id;
+            if (update.Message.Location == null)
             {
-                return;
-            }
-
-            if (update.Type != UpdateType.Message || update.Message?.Text == null)
-            {
-                return;
-            }
-
-            long chatId = update.Message.Chat.Id;
-
-            var keyboard = new ReplyKeyboardMarkup(new[]
-            {
-                new KeyboardButton[]
+                var locationKeyboard = new ReplyKeyboardMarkup(new[]
                 {
-                    KeyboardButton.WithRequestLocation("📍 Send your location")
-                }
-            })
-            {
-                ResizeKeyboard = true,
-                OneTimeKeyboard = true
-            };
+                    new KeyboardButton[]
+                    {
+                        new("📍 Send my location") { RequestLocation = true }
+                    }
+                })
+                {
+                    ResizeKeyboard = true,
+                    OneTimeKeyboard = false
+                };
+
+                _ = await _botClient.SendMessage(
+                    chatId,
+                    "To show weather at your location, please tap the button below:",
+                    replyMarkup: locationKeyboard
+                );
+            }
 
             _ = await _botClient.SendMessage(
                 chatId,
-                "Share your live location to get accurate weather for where you are 🌦",
-                replyMarkup: keyboard
+                "Choose a weather option:",
+                replyMarkup: BotButtons.Keyboards.WeatherMenu
             );
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling /weather command");
-
-            _ = await _botClient.SendMessage(
-                update.Message!.Chat.Id,
-                "⚠️ Something went wrong while requesting your location."
-            );
         }
     }
 }
