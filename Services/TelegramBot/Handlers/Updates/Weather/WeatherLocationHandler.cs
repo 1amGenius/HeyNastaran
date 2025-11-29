@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Nastaran_bot.Services.TelegramBot.Handlers.Updates;
+namespace Nastaran_bot.Services.TelegramBot.Handlers.Updates.Weather;
 
 public class WeatherLocationHandler(
     ITelegramBotClient botClient,
