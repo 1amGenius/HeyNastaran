@@ -1,11 +1,11 @@
 ﻿
 using MongoDB.Driver;
 
-using Nastaran_bot.Repositories.DailyNote;
+using Nastaran_bot.Repositories.Quote;
 using Nastaran_bot.Repositories.Idea;
 using Nastaran_bot.Repositories.Inspiration;
 using Nastaran_bot.Repositories.User;
-using Nastaran_bot.Services.DailyNote;
+using Nastaran_bot.Services.Quote;
 using Nastaran_bot.Services.Idea;
 using Nastaran_bot.Services.Inspiration;
 using Nastaran_bot.Services.TelegramBot;
@@ -65,7 +65,7 @@ builder.Services.AddScoped<IWeatherApiClient, WeatherApiClient>();
 // 6. Repositories DI
 // ========================
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IDailyNoteRepository, DailyNoteRepository>();
+builder.Services.AddScoped<IQuoteRepository, QuoteRepository>();
 builder.Services.AddScoped<IIdeaRepository, IdeaRepository>();
 builder.Services.AddScoped<IInspirationRepository, InspirationRepository>();
 
@@ -73,7 +73,7 @@ builder.Services.AddScoped<IInspirationRepository, InspirationRepository>();
 // 7. Services DI
 // ========================
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IDailyNoteService, DailyNoteService>();
+builder.Services.AddScoped<IQuoteService, QuoteService>();
 builder.Services.AddScoped<IIdeaService, IdeaService>();
 builder.Services.AddScoped<IInspirationService, InspirationService>();
 

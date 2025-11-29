@@ -49,13 +49,13 @@ public class StartCommandHandler(
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
                 new KeyboardButton[] { BotButtons.Texts.Songs },
-                [BotButtons.Texts.Quotes],
-                [BotButtons.Texts.Weather],
-                [BotButtons.Texts.Notes],
-                [BotButtons.Texts.Ideas],
-                [BotButtons.Texts.Inspirations],
-                [BotButtons.Texts.Settings],
-                [BotButtons.Texts.Help]
+                [BotButtons.Texts.Quotes], // daily, random, by category
+                [BotButtons.Texts.Weather], // current, weekly, daily, hourly
+                [BotButtons.Texts.Notes], //Daily, monthly, yearly
+                [BotButtons.Texts.Ideas], // things to achieve, to buy, to read
+                [BotButtons.Texts.Inspirations], // images, articles, everything that can be stored in mongo
+                [BotButtons.Texts.Settings], //prefrences, language
+                [BotButtons.Texts.Help] // how to use the bot
             })
             {
                 ResizeKeyboard = true,

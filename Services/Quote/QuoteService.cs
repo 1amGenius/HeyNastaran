@@ -1,13 +1,13 @@
-﻿using Nastaran_bot.Repositories.DailyNote;
+﻿using Nastaran_bot.Repositories.Quote;
 
-namespace Nastaran_bot.Services.DailyNote;
+namespace Nastaran_bot.Services.Quote;
 
-public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<DailyNoteService> logger) : IDailyNoteService
+public class QuoteService(IQuoteRepository dailyNoteRepository, ILogger<QuoteService> logger) : IQuoteService
 {
-    private readonly IDailyNoteRepository _dailyNoteRepository = dailyNoteRepository;
-    private readonly ILogger<DailyNoteService> _logger = logger;
+    private readonly IQuoteRepository _dailyNoteRepository = dailyNoteRepository;
+    private readonly ILogger<QuoteService> _logger = logger;
 
-    public async Task<Models.DailyNote> AddNoteAsync(
+    public async Task<Models.Quote> AddNoteAsync(
         long telegramId,
         string text,
         string category = "general",
@@ -15,7 +15,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
     {
         try
         {
-            var newNote = new Models.DailyNote
+            var newNote = new Models.Quote
             {
                 TelegramId = telegramId,
                 Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
@@ -37,7 +37,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
         }
     }
 
-    public async Task<IEnumerable<Models.DailyNote>> GetUserNotesAsync(long telegramId)
+    public async Task<IEnumerable<Models.Quote>> GetUserNotesAsync(long telegramId)
     {
         try
         {
@@ -63,7 +63,7 @@ public class DailyNoteService(IDailyNoteRepository dailyNoteRepository, ILogger<
         }
     }
 
-    public async Task<Models.DailyNote> GetNoteByIdAsync(string id)
+    public async Task<Models.Quote> GetNoteByIdAsync(string id)
     {
         try
         {

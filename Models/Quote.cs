@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Nastaran_bot.Models;
 
-public class DailyNote
+public class Quote
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
