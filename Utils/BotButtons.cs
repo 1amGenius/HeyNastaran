@@ -1,4 +1,8 @@
-﻿namespace Nastaran_bot.Utils;
+﻿using Telegram.Bot.Types.ReplyMarkups;
+
+using static Nastaran_bot.Utils.BotButtons.Texts;
+
+namespace Nastaran_bot.Utils;
 
 public static class BotButtons
 {
@@ -14,28 +18,79 @@ public static class BotButtons
         public const string Help = "/help";
     }
 
+    public static class Actions
+    {
+        public static class WeatherActions
+        {
+            public const string Current = "weather_current";
+            public const string Hourly = "weather_hourly";
+            public const string Daily = "weather_daily";
+            public const string Weekly = "weather_weekly";
+            public const string SearchCity = "weather_search";
+        }
+    }
+
     public static class Texts
     {
         public const string Songs = "🎵 Songs";
         public const string Quotes = "💬 Quotes";
-        public const string Weather = "🌤 Weather";
         public const string Notes = "📝 Notes";
         public const string Ideas = "💡 Ideas";
         public const string Inspirations = "🎀 Inspirations";
         public const string Settings = "⚙ Settings";
         public const string Help = "❓ Help";
+
+        public static class Weather
+        {
+            public const string _ = "🌤 Weather";
+            public const string Current = "🌦 Current weather";
+            public const string Hourly = "⏱ Hourly forecast";
+            public const string Daily = "📆 Daily forecast";
+            public const string Weekly = "📅 Weekly forecast";
+            public const string SearchCity = "🔍 Search city";
+        }
     }
 
-    public static readonly IReadOnlyDictionary<string, string> ButtonToCommand = new Dictionary<string, string>
+    public static class Keyboards
+    {
+        public static InlineKeyboardMarkup WeatherMenu => new(new[]
+        {
+        new[]
+        {
+            InlineKeyboardButton.WithCallbackData(Weather.Current, Actions.WeatherActions.Current),
+            InlineKeyboardButton.WithCallbackData(Weather.Hourly, Actions.WeatherActions.Hourly)
+        },
+        [
+            InlineKeyboardButton.WithCallbackData(Weather.Daily, Actions.WeatherActions.Daily),
+            InlineKeyboardButton.WithCallbackData(Weather.Weekly, Actions.WeatherActions.Weekly)
+        ],
+        [
+            InlineKeyboardButton.WithCallbackData(Weather.SearchCity, Actions.WeatherActions.SearchCity)
+        ]
+    });
+    }
+
+    public static readonly IReadOnlyDictionary<string, string> GlobalButtonsToCommand = new Dictionary<string, string>
     {
         [Texts.Songs] = Commands.Songs,
         [Texts.Quotes] = Commands.Quotes,
-        [Texts.Weather] = Commands.Weather,
+        [Texts.Weather._] = Commands.Weather,
         [Texts.Notes] = Commands.Notes,
         [Texts.Ideas] = Commands.Ideas,
         [Texts.Inspirations] = Commands.Inspirations,
         [Texts.Settings] = Commands.Settings,
         [Texts.Help] = Commands.Help
     };
+
+    public static readonly IReadOnlyDictionary<string, string> WeatherButtonsToAction =
+    new Dictionary<string, string>
+    {
+        [Weather.Current] = Actions.WeatherActions.Current,
+        [Weather.Hourly] = Actions.WeatherActions.Hourly,
+        [Weather.Daily] = Actions.WeatherActions.Daily,
+        [Weather.Weekly] = Actions.WeatherActions.Weekly,
+        [Weather.SearchCity] = Actions.WeatherActions.SearchCity
+    };
+
 }
 
