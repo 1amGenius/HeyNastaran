@@ -2,8 +2,6 @@
 
 using Nastaran_bot.Services.TelegramBot;
 
-using Telegram.Bot.Types;
-
 namespace Nastaran_bot.Controllers;
 
 [ApiController]

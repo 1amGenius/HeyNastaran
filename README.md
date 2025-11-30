@@ -1,6 +1,6 @@
 # 🤖 HeyNastaran! Telegram Bot
 
-A personal Telegram bot for **Nastaran**, my best friend. Providing utility features like weather updates, daily notes, motivational messages, music suggestions, and idea/inspiration management. Built with **.NET 8** and **MongoDB**.
+A personal Telegram bot for **Nastaran**, my best friend. Providing utility features like weather updates, quotes, motivational messages, music suggestions, and idea/inspiration management. Built with **.NET 8** and **MongoDB**.
 
 ---
 
@@ -24,7 +24,7 @@ A personal Telegram bot for **Nastaran**, my best friend. Providing utility feat
 This bot is designed for one user (Nastaran) and provides utility functionality such as:  
 
 - 🌤 Weather forecasts for the next 7 days, including sunrise and sunset times.  
-- ✨ Daily motivational or upbeat notes.  
+- ✨ Daily motivational or upbeat quotes.  
 - 🎵 Daily music recommendations.  
 - 📢 Notifications when favorite artists release new tracks.  
 - 📝 Storage and retrieval of ideas (text) and inspirations (images).  
@@ -39,7 +39,7 @@ The backend is designed with **clean architecture principles**, **dependency inj
 - [x] Telegram webhook handling via `TelegramController`.  
 - [x] Orchestrator service `TelegramBotService` calling domain services.  
 - [x] User management (`UserService` + `UserRepository`).  
-- [x] Daily notes (`DailyNoteService` + `DailyNoteRepository`).  
+- [x] Daily notes (`QuoteService` + `QuoteRepository`).  
 - [x] Ideas (`IdeaService` + `IdeaRepository`).  
 - [x] Inspirations (`InspirationService` + `InspirationRepository`).  
 - [x] MongoDB integration with `IMongoClient` singleton.  

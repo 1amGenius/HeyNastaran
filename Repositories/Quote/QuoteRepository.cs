@@ -7,19 +7,19 @@ namespace Nastaran_bot.Repositories.Quote;
 
 public class QuoteRepository : IQuoteRepository
 {
-    private readonly IMongoCollection<Models.Quote> _dailyNotes;
+    private readonly IMongoCollection<Models.Quote> _quotes;
 
     public QuoteRepository(IMongoClient client)
     {
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
-        _dailyNotes = database.GetCollection<Models.Quote>("dailyNotes");
+        _quotes = database.GetCollection<Models.Quote>("quotes");
     }
 
     public async Task CreateAsync(Models.Quote entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        await _dailyNotes.InsertOneAsync(entity);
+        await _quotes.InsertOneAsync(entity);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -29,29 +29,29 @@ public class QuoteRepository : IQuoteRepository
             return false;
         }
 
-        DeleteResult result = await _dailyNotes.DeleteOneAsync(n => n.Id == id);
+        DeleteResult result = await _quotes.DeleteOneAsync(n => n.Id == id);
         return result.DeletedCount > 0;
     }
 
     public async Task<IEnumerable<Models.Quote>> FindAsync(Expression<Func<Models.Quote, bool>> filter)
     {
         ArgumentNullException.ThrowIfNull(filter);
-        return await _dailyNotes.AsQueryable().Where(filter).ToListAsync();
+        return await _quotes.AsQueryable().Where(filter).ToListAsync();
     }
 
     public async Task<IEnumerable<Models.Quote>> FindAllAsync()
-        => await _dailyNotes.Find(_ => true).ToListAsync();
+        => await _quotes.Find(_ => true).ToListAsync();
 
     public async Task<Models.Quote> FindByIdAsync(string id)
     {
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(n => n.Id, id);
-        return await _dailyNotes.Find(filter).FirstOrDefaultAsync();
+        return await _quotes.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Models.Quote>> FindByTelegramIdAsync(long telegramId)
     {
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq("telegramId", telegramId);
-        return await _dailyNotes.Find(filter).ToListAsync();
+        return await _quotes.Find(filter).ToListAsync();
     }
 
     public async Task UpdateAsync(Models.Quote entity)
@@ -62,11 +62,11 @@ public class QuoteRepository : IQuoteRepository
         entity.UpdatedAt = DateTime.UtcNow;
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(n => n.Id, entity.Id);
-        ReplaceOneResult result = await _dailyNotes.ReplaceOneAsync(filter, entity);
+        ReplaceOneResult result = await _quotes.ReplaceOneAsync(filter, entity);
 
         if (result.MatchedCount == 0)
         {
-            throw new InvalidOperationException($"DailyNote with Id {entity.Id} was not found.");
+            throw new InvalidOperationException($"Quote with Id {entity.Id} was not found.");
         }
     }
 }

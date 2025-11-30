@@ -2,9 +2,9 @@
 
 namespace Nastaran_bot.Services.Quote;
 
-public class QuoteService(IQuoteRepository dailyNoteRepository, ILogger<QuoteService> logger) : IQuoteService
+public class QuoteService(IQuoteRepository quoteRepository, ILogger<QuoteService> logger) : IQuoteService
 {
-    private readonly IQuoteRepository _dailyNoteRepository = dailyNoteRepository;
+    private readonly IQuoteRepository _quoteRepository = quoteRepository;
     private readonly ILogger<QuoteService> _logger = logger;
 
     public async Task<Models.Quote> AddNoteAsync(
@@ -27,7 +27,7 @@ public class QuoteService(IQuoteRepository dailyNoteRepository, ILogger<QuoteSer
                 UsedAt = null,
             };
 
-            await _dailyNoteRepository.CreateAsync(newNote);
+            await _quoteRepository.CreateAsync(newNote);
             return newNote;
         }
         catch (Exception ex)
@@ -41,7 +41,7 @@ public class QuoteService(IQuoteRepository dailyNoteRepository, ILogger<QuoteSer
     {
         try
         {
-            return await _dailyNoteRepository.FindByTelegramIdAsync(telegramId);
+            return await _quoteRepository.FindByTelegramIdAsync(telegramId);
         }
         catch (Exception ex)
         {
@@ -54,7 +54,7 @@ public class QuoteService(IQuoteRepository dailyNoteRepository, ILogger<QuoteSer
     {
         try
         {
-            return await _dailyNoteRepository.DeleteAsync(id);
+            return await _quoteRepository.DeleteAsync(id);
         }
         catch (Exception ex)
         {
@@ -67,7 +67,7 @@ public class QuoteService(IQuoteRepository dailyNoteRepository, ILogger<QuoteSer
     {
         try
         {
-            return await _dailyNoteRepository.FindByIdAsync(id);
+            return await _quoteRepository.FindByIdAsync(id);
         }
         catch (Exception ex)
         {

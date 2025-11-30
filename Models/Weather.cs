@@ -37,14 +37,6 @@ public class Weather
         get;
         set;
     } = [];
-
-    public override string ToString()
-        => $"{Current.Icon} {Current.Condition}\n" +
-               $"🌡 Temp: {Current.TemperatureC:F1}°C (Feels like {Current.FeelsLikeC:F1}°C)\n" +
-               $"💨 Wind: {Current.WindSpeedKph:F1} km/h\n" +
-               $"💧 Humidity: {Current.Humidity}%\n" +
-               $"☀️ Sunrise: {Daily.FirstOrDefault()?.Sunrise}\n" +
-               $"🌙 Sunset: {Daily.FirstOrDefault()?.Sunset}";
 }
 
 public class CurrentWeather
@@ -228,32 +220,4 @@ public class DailyForecast
         get;
         set;
     } = "🌤";
-}
-
-public class NominatimResponse
-{
-    public NominatimAddress Address
-    {
-        get; set;
-    }
-}
-
-public class NominatimAddress
-{
-    public string City
-    {
-        get; set;
-    }
-    public string Town
-    {
-        get; set;
-    }
-    public string Village
-    {
-        get; set;
-    }
-    public string Hamlet
-    {
-        get; set;
-    }
 }

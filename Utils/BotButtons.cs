@@ -72,14 +72,14 @@ public static class BotButtons
 
     public static readonly IReadOnlyDictionary<string, string> GlobalButtonsToCommand = new Dictionary<string, string>
     {
-        [Texts.Songs] = Commands.Songs,
-        [Texts.Quotes] = Commands.Quotes,
-        [Texts.Weather._] = Commands.Weather,
-        [Texts.Notes] = Commands.Notes,
-        [Texts.Ideas] = Commands.Ideas,
-        [Texts.Inspirations] = Commands.Inspirations,
-        [Texts.Settings] = Commands.Settings,
-        [Texts.Help] = Commands.Help
+        [Songs] = Commands.Songs,
+        [Quotes] = Commands.Quotes,
+        [Weather._] = Commands.Weather,
+        [Notes] = Commands.Notes,
+        [Ideas] = Commands.Ideas,
+        [Inspirations] = Commands.Inspirations,
+        [Settings] = Commands.Settings,
+        [Help] = Commands.Help
     };
 
     public static readonly IReadOnlyDictionary<string, string> WeatherButtonsToAction =
