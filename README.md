@@ -1,6 +1,6 @@
 # 🤖 HeyNastaran! Telegram Bot
 
-A personal Telegram bot for **Nastaran**, my best friend. Providing utility features like weather updates, quotes, motivational messages, music suggestions, and idea/inspiration management. Built with **.NET 8** and **MongoDB**.
+A personal Telegram bot for **Nastaran**, my best friend in the world <3. Providing utility features like weather updates, quotes, motivational messages, music suggestions, and idea/inspiration management. Built with **.NET 8** and **MongoDB**.
 
 ---
 
@@ -26,7 +26,7 @@ This bot is designed for one user (Nastaran) and provides utility functionality 
 - 🌤 Weather forecasts for the next 7 days, including sunrise and sunset times.  
 - ✨ Daily motivational or upbeat quotes.  
 - 🎵 Daily music recommendations.  
-- 📢 Notifications when favorite artists release new tracks.  
+- 📢 Notifications when favorite artists release new tracks (hope I can implement it for free).  
 - 📝 Storage and retrieval of ideas (text) and inspirations (images).  
 
 The backend is designed with **clean architecture principles**, **dependency injection**, and **MongoDB** for data persistence.
@@ -39,18 +39,18 @@ The backend is designed with **clean architecture principles**, **dependency inj
 - [x] Telegram webhook handling via `TelegramController`.  
 - [x] Orchestrator service `TelegramBotService` calling domain services.  
 - [x] User management (`UserService` + `UserRepository`).  
-- [x] Daily notes (`QuoteService` + `QuoteRepository`).  
+- [x] Quotes (`QuoteService` + `QuoteRepository`).  
 - [x] Ideas (`IdeaService` + `IdeaRepository`).  
 - [x] Inspirations (`InspirationService` + `InspirationRepository`).  
 - [x] MongoDB integration with `IMongoClient` singleton.  
 - [x] Swagger/OpenAPI documentation in development.  
 
 ### Planned / Future
-- [ ] 🌤 Fetch weather data via a public API.  
+- [x] 🌤 Fetch weather data via a public API.  
 - [ ] ✨ Send daily motivational notes.  
-- [ ] 🎵 Send daily music (Spotify integration or public Telegram channels).  
+- [ ] 🎵 Send daily music (Spotify or soundcload integration or public Telegram channels).  
 - [ ] 📢 Track favorite artists’ releases.  
-- [ ] ⚡ Inline commands for Telegram (e.g., `/note`, `/idea`).  
+- [x] ⚡ Inline commands for Telegram (e.g., `/note`, `/idea`).  
 - [ ] ⏰ Scheduled tasks (daily notes, music, notifications).  
 
 ---
@@ -74,7 +74,7 @@ The backend is designed with **clean architecture principles**, **dependency inj
 **Other Libraries / Planned**:  
 - `System.Text.Json` for JSON serialization (used in responses and webhook parsing).  
 - `Hangfire` or similar (planned) for background jobs/scheduled tasks.  
-- `SpotifyAPI-NET` (planned) for fetching music releases.  
+- `SpotifyAPI-NET` or similar (planned) for fetching music releases.  
 
 ---
 
@@ -90,15 +90,15 @@ TelegramBotService (orchestrator)
 		|
 		▼
 Domain Services
-(UserService, DailyNoteService, IdeaService, InspirationService)
+(UserService, QuoteService, IdeaService, InspirationService)
 		|
 		▼
 Repositories
-(UserRepository, DailyNoteRepository, IdeaRepository, InspirationRepository)
+(UserRepository, QuoteRepository, IdeaRepository, InspirationRepository)
 		|
 		▼
 MongoDB (collections)
-(Users, DailyNotes, Ideas, Inspirations)
+(Users, Quotes, Ideas, Inspirations)
 ```
 
 **Dependency Injection** is used throughout:
@@ -176,20 +176,32 @@ MongoDB (collections)
 /Controllers
 |   TelegramController.cs
 
+/Contracts
+|	/User
+|	|	LocationDto.cs
+|	|	PrefrencesDto.cs
+|	|	UserCreateDto.cs
+|	|	UserUpdateDto.cs
+|
+|	/Weather
+|	|	ReverseGeocodingResult.cs
+|	|	WeatherData.cs
+
 /Models
 |   User.cs
-|   DailyNote.cs
+|   Quote.cs
 |   Idea.cs
 |   Inspiration.cs
+|	Weather.cs
 
 /Repositories
 |   /User
 |   |    IUserRepository.cs
 |   |    UserRepository.cs
-|
-|   /DailyNote
-|   |    IDailyNoteRepository.cs
-|   |    DailyNoteRepository.cs
+|	
+|   /Quote
+|   |    IQuoteRepository.cs
+|   |    QuoteRepository.cs
 |
 |   /Idea
 |   |    IIdeaRepository.cs
@@ -204,9 +216,9 @@ MongoDB (collections)
 |   |   IUserService.cs
 |   |   UserService.cs
 |
-|   /DailyNote
-|   |   IDailyNoteService.cs
-|   |   DailyNoteService.cs
+|   /Quote
+|   |   IQuoteService.cs
+|   |   QuoteService.cs
 |
 |   /Idea
 |   |   IIdeaService.cs
@@ -217,28 +229,100 @@ MongoDB (collections)
 |   |   InspirationService.cs
 |
 |   /TelegramBot
-|	|	/Commands
-|	|	|	CommandRouter.cs
-|	|	|	ICommandHandler.cs
-|	|	|	IdeaCommandHandler.cs
-|	|	|	InspirationCommandHandler.cs
-|	|	|	NoteCommandHandler.cs
-|	|	|	WeatherCommandHandler.cs
-|	|
+|	|	/Handlers
+|	|	|	/Commands
+|	|	|	|
+|	|	|	|	/Idea
+|	|	|	|	|	IdeaCommandHandler.cs
+|	|	|	|
+|	|	|	|	/Inspiration
+|	|	|	|	|	InspirationCommandHandler.cs
+|	|	|	|
+|	|	|	|	/Note
+|	|	|	|	|	NoteCommandHandler.cs
+|	|	|	|
+|	|	|	|	/Quote
+|	|	|	|
+|	|	|	|	/Song
+|	|	|	|
+|	|	|	|	/Weather
+|	|	|	|	|	WeatherCommandHandler.cs
+|	|	|	|
+|	|	|	|	StartCommandHandler.cs
+|	|	|
+|	|	|	/Updates
+|	|	|	|
+|	|	|	|	/Idea
+|	|	|	|
+|	|	|	|	/Inspiration
+|	|	|	|
+|	|	|	|	/Note
+|	|	|	|
+|	|	|	|	/Quote
+|	|	|	|
+|	|	|	|	/Song
+|	|	|	|
+|	|	|	|	/Weather
+|	|	|	|	|	WeatherCallbackHandler.cs
+|	|	|	|	|	WeatherCityHandler.cs
+|	|	|	|	|	WeatherLocationHandler.cs
+|	|	|	|	|	WeatherSearchCityHandler.cs
+|	|	|	|	|	WeatherSearchStartHandler.cs
+|	|	|	|
+|	|	|
+|	|	|	/Interfaces
+|	|	|	|	
+|	|	|	|	ICommandHandler.cs
+|	|	|	|	IUpdateHandler.cs
+|	|	|
+|	|	|	/Routing
+|	|	|	|
+|	|	|	|	CommandRouter.cs
+|	|	|	|	UpdateRouter.cs
+|	|	
 |   |   TelegramBotService.cs
 
 /Utils
 |	/Helpers
-|	|	MusicApiClient.cs
-|	|	Scheduler.cs
-|	|	WeatherApiClient.cs
+|	|	/Music
+|	|	|	/Clients
+|	|	|	|	MusicApiClient.cs
+|	|	|	/Interfaces
+|	|	|	|	IMusicApiClient.cs
+|	|	
+|	|	/Scheduler
+|	|	|	/Clients
+|	|	|	|	Scheduler.cs
+|	|	|	/Interfaces
+|	|	|	|	IScheduler.cs
+|	|
+|	|	/Weather
+|	|	|	/Clients
+|	|	|	|	WeatherApiClient.cs
+|	|	|	|	WeatherHttpClient.cs
+|	|	|	/Interfaces
+|	|	|	|	IWeatherApiClient.cs
+|	|	|	|	IWeatherHttpClient.cs
 |
+|	/Formaters
+|	|	FormatWeather.cs
+|
+|	/Mappers
+|	|	PrefrencesMapper.cs
+|	|	UserMapper.cs
+|	|	WeatherMapper.cs
+|
+|	/Urls
+|	|	WeatherApiUrls.cs
+|	
+|	BotButtons.cs
 |	CodeUtility.cs
 
 Program.cs
 appsettings.json
 appsettings.Development.json (ignored)
 Dockerfile
+LICENSE.txt
 ```
 
 ---
@@ -247,7 +331,7 @@ Dockerfile
 
 1. Integrate Weather API (daily + 7-day forecast).
 2. Daily motivational messages via Telegram.
-3. Music recommendations using Spotify or Telegram channels.
+3. Music recommendations using Spotify, soundcload or Telegram channels.
 4. Scheduled tasks (daily updates).
 5. Extend TelegramBotService with inline commands.
 6. Logging and monitoring enhancements.
