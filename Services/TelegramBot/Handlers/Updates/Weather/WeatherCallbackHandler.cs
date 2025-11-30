@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ActionConstraints;
-
-using Nastaran_bot.Services.TelegramBot.Interfaces;
+﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
 using Nastaran_bot.Services.User;
 using Nastaran_bot.Utils;
 using Nastaran_bot.Utils.Formaters;
@@ -44,7 +42,7 @@ public class WeatherCallbackHandler(
         Models.User user = await _userService.GetUserByTelegramIdAsync(callback.From.Id);
 
         if (user.Location == null &&
-            action != BotButtons.Actions.WeatherActions.SearchCity)
+            action != Actions.WeatherActions.SearchCity)
         {
             _ = await _botClient.SendMessage(
                 chatId,

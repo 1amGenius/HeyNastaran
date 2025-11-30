@@ -19,7 +19,7 @@ public class StartCommandHandler(
     private readonly ILogger<StartCommandHandler> _logger = logger;
     private readonly IUserService _userService = userService;
 
-    public string Command => "/start";
+    public string Command => BotButtons.Commands.Start;
 
     public async Task HandleAsync(Update update)
     {
@@ -48,14 +48,23 @@ public class StartCommandHandler(
 
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
-                new KeyboardButton[] { BotButtons.Texts.Songs },
-                [BotButtons.Texts.Quotes], // daily, random, by category
-                [BotButtons.Texts.Weather._], // current, weekly, daily, hourly
-                [BotButtons.Texts.Notes], //Daily, monthly, yearly
-                [BotButtons.Texts.Ideas], // things to achieve, to buy, to read
-                [BotButtons.Texts.Inspirations], // images, articles, everything that can be stored in mongo
-                [BotButtons.Texts.Settings], //prefrences, language
-                [BotButtons.Texts.Help] // how to use the bot
+                new KeyboardButton[]
+                {
+                    BotButtons.Texts.Songs,
+                    BotButtons.Texts.Quotes
+                },
+                [
+                    BotButtons.Texts.Weather._,
+                    BotButtons.Texts.Notes
+                ],
+                [
+                    BotButtons.Texts.Ideas,
+                    BotButtons.Texts.Inspirations
+                ],
+                [
+                    BotButtons.Texts.Settings,
+                    BotButtons.Texts.Help
+                ]
             })
             {
                 ResizeKeyboard = true,

@@ -15,7 +15,7 @@ public class WeatherCommandHandler(
     private readonly ITelegramBotClient _botClient = botClient;
     private readonly ILogger<WeatherCommandHandler> _logger = logger;
 
-    public string Command => BotButtons.Texts.Weather._;
+    public string Command => BotButtons.Commands.Weather;
 
     public async Task HandleAsync(Update update)
     {

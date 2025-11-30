@@ -38,16 +38,18 @@ public class WeatherSearchCityHandler(
         try
         {
             (float lat, float lon) = await _weatherApi.GetCoordinatesByCityNameAsync(city);
-            Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(lat, lon);
+            Models.Weather weather = await _weatherApi.GetCurrentWeatherAsync(lat, lon);
 
             _ = await _botClient.SendMessage(chatId,
                 FormatWeather.CitySummary(city, weather.Current),
                 parseMode: ParseMode.MarkdownV2);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to fetch weather for city '{City}'", city);
+
             _ = await _botClient.SendMessage(chatId,
-                "I couldn't find that city. Try something like: `London`",
+                "⚠️ I couldn't find weather information for that city. Try something like: `London`",
                 parseMode: ParseMode.MarkdownV2);
         }
     }

@@ -4,6 +4,19 @@ namespace Nastaran_bot.Utils.Formaters;
 
 public static class FormatWeather
 {
+    public static string Full(string city, CurrentWeather w)
+    => $@"🌤 Weather in *{city}*
+
+🌡 Temp: {w.TemperatureC:F1}°C
+🥵 Feels like: {w.FeelsLikeC:F1}°C
+💧 Humidity: {w.Humidity}%
+🌬 Wind: {w.WindSpeedKph:F1} km/h
+☁️ Clouds: {w.CloudCover}%
+🌧 Rain: {w.RainChance}%
+🔆 UV: {w.UvIndex:F1}
+
+Condition: *{w.Condition}* {w.Icon}";
+
     public static string Current(CurrentWeather w)
         => $@"🌦 *Current weather*
 

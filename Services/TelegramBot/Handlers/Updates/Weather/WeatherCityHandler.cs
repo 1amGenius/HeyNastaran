@@ -1,4 +1,5 @@
 ﻿using Nastaran_bot.Services.TelegramBot.Interfaces;
+using Nastaran_bot.Utils.Formaters;
 using Nastaran_bot.Utils.Helpers.Weather.Interfaces;
 
 using Telegram.Bot;
@@ -56,21 +57,7 @@ public class WeatherCityHandler(
             Models.Weather weather = await _weatherApi.GetFullWeatherReportAsync(latitude, longitude);
             Models.CurrentWeather cw = weather.Current;
 
-            string msg =
-    $@"🌤 Weather in *{city}*
-
-🌡 Temperature: {cw.TemperatureC:F1}°C
-🥵 Feels like: {cw.FeelsLikeC:F1}°C
-💧 Humidity: {cw.Humidity}%
-🌬 Wind: {cw.WindSpeedKph:F1} km/h
-☁️ Clouds: {cw.CloudCover}%
-🌧 Rain chance: {cw.RainChance}%
-🔆 UV Index: {cw.UvIndex:F1}
-
-Condition: *{cw.Condition}* {cw.Icon}
-";
-
-            _ = await _botClient.SendMessage(chatId, msg, ParseMode.MarkdownV2);
+            _ = await _botClient.SendMessage(chatId, FormatWeather.Full(city, cw), ParseMode.MarkdownV2);
         }
         catch (Exception ex)
         {

@@ -8,6 +8,7 @@ public static class BotButtons
 {
     public static class Commands
     {
+        public const string Start = "/start";
         public const string Songs = "/songs";
         public const string Quotes = "/quotes";
         public const string Weather = "/weather";
