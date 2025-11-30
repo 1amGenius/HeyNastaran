@@ -4,37 +4,43 @@ public class UserUpdateDto
 {
     public string Username
     {
-        get;
+        get; 
         set;
     }
 
     public string FirstName
     {
-        get;
+        get; 
         set;
     }
 
     public string Timezone
     {
-        get;
+        get; 
         set;
     }
 
     public LocationDto Location
     {
-        get;
+        get; 
         set;
     }
 
     public PreferencesDto Preferences
     {
-        get;
+        get; 
         set;
     }
 
     public List<string> FavoriteArtists
     {
-        get;
+        get; 
+        set;
+    }
+
+    public bool? IsSearchingCity
+    {
+        get; 
         set;
     }
 }

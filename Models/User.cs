@@ -41,6 +41,9 @@ public class User
         set;
     } = new();
 
+    [BsonElement("isSearchingCity")]
+    public bool IsSearchingCity { get; set; } = false;
+
     [BsonElement("timezone")]
     public string Timezone
     {
