@@ -42,7 +42,7 @@ public class WeatherCallbackHandler(
         Models.User user = await _userService.GetUserByTelegramIdAsync(callback.From.Id);
 
         if (user.Location == null &&
-            action != Actions.WeatherActions.SearchCity)
+            action != Actions.Weather.SearchCity)
         {
             _ = await _botClient.SendMessage(
                 chatId,
@@ -69,23 +69,23 @@ public class WeatherCallbackHandler(
         {
             switch (action)
             {
-                case var a when a == Actions.WeatherActions.Current:
+                case var a when a == Actions.Weather.Current:
                     await SendCurrentWeather(chatId, user);
                     break;
 
-                case var a when a == Actions.WeatherActions.Hourly:
+                case var a when a == Actions.Weather.Hourly:
                     await SendHourlyWeather(chatId, user);
                     break;
 
-                case var a when a == Actions.WeatherActions.Daily:
+                case var a when a == Actions.Weather.Daily:
                     await SendDailyWeather(chatId, user);
                     break;
 
-                case var a when a == Actions.WeatherActions.Weekly:
+                case var a when a == Actions.Weather.Weekly:
                     await SendWeeklyWeather(chatId, user);
                     break;
 
-                case var a when a == Actions.WeatherActions.SearchCity:
+                case var a when a == Actions.Weather.SearchCity:
                     _ = await _botClient.SendMessage(chatId, "Send the city name:");
                     break;
             }

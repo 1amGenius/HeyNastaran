@@ -1,5 +1,5 @@
 ﻿namespace Nastaran_bot.Utils;
 
-public static class Codeutility
+public static class CodeUtility
 {
 }

@@ -8,4 +8,3 @@ public interface IWeatherHttpClient
         get;
     }
 }
-

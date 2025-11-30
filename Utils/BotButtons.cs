@@ -21,7 +21,7 @@ public static class BotButtons
 
     public static class Actions
     {
-        public static class WeatherActions
+        public static class Weather
         {
             public const string Current = "weather_current";
             public const string Hourly = "weather_hourly";
@@ -58,15 +58,15 @@ public static class BotButtons
         {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(Weather.Current, Actions.WeatherActions.Current),
-            InlineKeyboardButton.WithCallbackData(Weather.Hourly, Actions.WeatherActions.Hourly)
+            InlineKeyboardButton.WithCallbackData(Weather.Current, Actions.Weather.Current),
+            InlineKeyboardButton.WithCallbackData(Weather.Hourly, Actions.Weather.Hourly)
         },
         [
-            InlineKeyboardButton.WithCallbackData(Weather.Daily, Actions.WeatherActions.Daily),
-            InlineKeyboardButton.WithCallbackData(Weather.Weekly, Actions.WeatherActions.Weekly)
+            InlineKeyboardButton.WithCallbackData(Weather.Daily, Actions.Weather.Daily),
+            InlineKeyboardButton.WithCallbackData(Weather.Weekly, Actions.Weather.Weekly)
         ],
         [
-            InlineKeyboardButton.WithCallbackData(Weather.SearchCity, Actions.WeatherActions.SearchCity)
+            InlineKeyboardButton.WithCallbackData(Weather.SearchCity, Actions.Weather.SearchCity)
         ]
     });
     }
@@ -86,11 +86,11 @@ public static class BotButtons
     public static readonly IReadOnlyDictionary<string, string> WeatherButtonsToAction =
     new Dictionary<string, string>
     {
-        [Weather.Current] = Actions.WeatherActions.Current,
-        [Weather.Hourly] = Actions.WeatherActions.Hourly,
-        [Weather.Daily] = Actions.WeatherActions.Daily,
-        [Weather.Weekly] = Actions.WeatherActions.Weekly,
-        [Weather.SearchCity] = Actions.WeatherActions.SearchCity
+        [Weather.Current] = Actions.Weather.Current,
+        [Weather.Hourly] = Actions.Weather.Hourly,
+        [Weather.Daily] = Actions.Weather.Daily,
+        [Weather.Weekly] = Actions.Weather.Weekly,
+        [Weather.SearchCity] = Actions.Weather.SearchCity
     };
 
 }
