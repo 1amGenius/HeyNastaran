@@ -47,19 +47,7 @@ public class WeatherCallbackHandler(
             _ = await _botClient.SendMessage(
                 chatId,
                 "Please share your location:",
-                replyMarkup: new ReplyKeyboardMarkup(new[]
-                {
-                    new KeyboardButton[]
-                    {
-                        new("📍 Send my location")
-                        {
-                            RequestLocation = true
-                        }
-                    }
-                })
-                {
-                    ResizeKeyboard = true
-                }
+                replyMarkup: BotButtons.Keyboards.RequestLocationMenu
             );
 
             return;

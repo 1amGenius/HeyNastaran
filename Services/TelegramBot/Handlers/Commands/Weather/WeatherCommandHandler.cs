@@ -24,22 +24,10 @@ public class WeatherCommandHandler(
             long chatId = update.Message!.Chat.Id;
             if (update.Message.Location == null)
             {
-                var locationKeyboard = new ReplyKeyboardMarkup(new[]
-                {
-                    new KeyboardButton[]
-                    {
-                        new("📍 Send my location") { RequestLocation = true }
-                    }
-                })
-                {
-                    ResizeKeyboard = true,
-                    OneTimeKeyboard = false
-                };
-
                 _ = await _botClient.SendMessage(
                     chatId,
                     "To show weather at your location, please tap the button below:",
-                    replyMarkup: locationKeyboard
+                    replyMarkup: BotButtons.Keyboards.RequestLocationMenu
                 );
             }
 

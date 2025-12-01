@@ -54,21 +54,60 @@ public static class BotButtons
 
     public static class Keyboards
     {
+        public static ReplyKeyboardMarkup StartMenu => new(new[]
+        {
+                new KeyboardButton[]
+                {
+                    Songs,
+                    Quotes
+                },
+                [
+                    Weather._,
+                    Notes
+                ],
+                [
+                    Ideas,
+                    Inspirations
+                ],
+                [
+                    Settings,
+                    Help
+                ]
+        })
+        {
+            ResizeKeyboard = true,
+            OneTimeKeyboard = false,
+            IsPersistent = true,
+            InputFieldPlaceholder = "Choose an option..."
+        };
+
+        public static ReplyKeyboardMarkup RequestLocationMenu => new(new[]
+        {
+            new KeyboardButton[]
+            {
+                new("📍 Send my location") { RequestLocation = true }
+            }
+        })
+        {
+            ResizeKeyboard = true,
+            OneTimeKeyboard = false
+        };
+
         public static InlineKeyboardMarkup WeatherMenu => new(new[]
         {
-        new[]
-        {
-            InlineKeyboardButton.WithCallbackData(Weather.Current, Actions.Weather.Current),
-            InlineKeyboardButton.WithCallbackData(Weather.Hourly, Actions.Weather.Hourly)
-        },
-        [
-            InlineKeyboardButton.WithCallbackData(Weather.Daily, Actions.Weather.Daily),
-            InlineKeyboardButton.WithCallbackData(Weather.Weekly, Actions.Weather.Weekly)
-        ],
-        [
-            InlineKeyboardButton.WithCallbackData(Weather.SearchCity, Actions.Weather.SearchCity)
-        ]
-    });
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData(Weather.Current, Actions.Weather.Current),
+                InlineKeyboardButton.WithCallbackData(Weather.Hourly, Actions.Weather.Hourly)
+            },
+            [
+                InlineKeyboardButton.WithCallbackData(Weather.Daily, Actions.Weather.Daily),
+                InlineKeyboardButton.WithCallbackData(Weather.Weekly, Actions.Weather.Weekly)
+            ],
+            [
+                InlineKeyboardButton.WithCallbackData(Weather.SearchCity, Actions.Weather.SearchCity)
+            ]
+        });
     }
 
     public static readonly IReadOnlyDictionary<string, string> GlobalButtonsToCommand = new Dictionary<string, string>

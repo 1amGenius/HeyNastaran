@@ -46,33 +46,6 @@ public class StartCommandHandler(
 
             _ = await _userService.AddUserAsync(telegramId, username, firstName, "UTC");
 
-            var keyboard = new ReplyKeyboardMarkup(new[]
-            {
-                new KeyboardButton[]
-                {
-                    BotButtons.Texts.Songs,
-                    BotButtons.Texts.Quotes
-                },
-                [
-                    BotButtons.Texts.Weather._,
-                    BotButtons.Texts.Notes
-                ],
-                [
-                    BotButtons.Texts.Ideas,
-                    BotButtons.Texts.Inspirations
-                ],
-                [
-                    BotButtons.Texts.Settings,
-                    BotButtons.Texts.Help
-                ]
-            })
-            {
-                ResizeKeyboard = true,
-                OneTimeKeyboard = false,
-                IsPersistent = true,
-                InputFieldPlaceholder = "Choose an option..."
-            };
-
             string welcomeMessage =
 $@"Hello {firstName}! 👋
 I'm your personal bot.
@@ -80,7 +53,7 @@ I'm your personal bot.
 You can get daily music, quotes, and weather updates right here.
 Use the keyboard below to get started:";
 
-            _ = await _botClient.SendMessage(chatId, welcomeMessage, replyMarkup: keyboard);
+            _ = await _botClient.SendMessage(chatId, welcomeMessage, replyMarkup: BotButtons.Keyboards.StartMenu);
         }
         catch (Exception ex)
         {
