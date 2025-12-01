@@ -3,8 +3,14 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Nastaran_bot.Models;
 
+/// <summary>
+/// Represents a stored quote with metadata, authorship, and categorization.
+/// </summary>
 public class Quote
 {
+    /// <summary>
+    /// Unique identifier for the quote document.
+    /// </summary>
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id
@@ -13,6 +19,9 @@ public class Quote
         set;
     } = string.Empty;
 
+    /// <summary>
+    /// Telegram user identifier associated with the quote.
+    /// </summary>
     [BsonElement("telegramId")]
     public long TelegramId
     {
@@ -20,6 +29,9 @@ public class Quote
         set;
     }
 
+    /// <summary>
+    /// Date string related to the quote, such as when it was noted or relevant.
+    /// </summary>
     [BsonElement("date")]
     public string Date
     {
@@ -27,6 +39,9 @@ public class Quote
         set;
     } = string.Empty;
 
+    /// <summary>
+    /// Full text of the quote.
+    /// </summary>
     [BsonElement("text")]
     public string Text
     {
@@ -34,6 +49,9 @@ public class Quote
         set;
     } = string.Empty;
 
+    /// <summary>
+    /// Category or thematic grouping of the quote.
+    /// </summary>
     [BsonElement("category")]
     public string Category
     {
@@ -41,6 +59,9 @@ public class Quote
         set;
     } = string.Empty;
 
+    /// <summary>
+    /// Author of the quote. Defaults to "unknown" if not provided.
+    /// </summary>
     [BsonElement("author")]
     public string Author
     {
@@ -48,6 +69,9 @@ public class Quote
         set;
     } = "unknown";
 
+    /// <summary>
+    /// Timestamp indicating the last time this quote was used. Null if unused.
+    /// </summary>
     [BsonElement("usedAt")]
     [BsonIgnoreIfNull]
     public DateTime? UsedAt
@@ -55,6 +79,9 @@ public class Quote
         get; set;
     }
 
+    /// <summary>
+    /// UTC timestamp indicating when the quote was created.
+    /// </summary>
     [BsonElement("createdAt")]
     public DateTime CreatedAt
     {
@@ -62,6 +89,10 @@ public class Quote
         set;
     } = DateTime.UtcNow;
 
+
+    /// <summary>
+    /// UTC timestamp indicating when the quote was last updated.
+    /// </summary>
     [BsonElement("updatedAt")]
     public DateTime UpdatedAt
     {
