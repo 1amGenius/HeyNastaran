@@ -1,28 +1,44 @@
 ﻿namespace Nastaran_bot.Contracts.User;
 
+/// <summary>
+/// Data transfer object representing a user's geographic location.
+/// Mirrors the structure of <see cref="Models.Location"/> for external requests.
+/// </summary>
 public class LocationDto
 {
-    public string City
+    /// <summary>
+    /// City name of the user's location.
+    /// </summary>
+    public string City 
     {
-        get;
+        get; 
         set;
     } = string.Empty;
 
-    public string Country
-    {
-        get;
-        set;
+    /// <summary>
+    /// Country name of the user's location.
+    /// </summary>
+    public string Country 
+    { 
+        get; 
+        set; 
     } = string.Empty;
 
+    /// <summary>
+    /// Latitude coordinate of the user's location.
+    /// </summary>
     public double Lat
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Longitude coordinate of the user's location.
+    /// </summary>
     public double Lon
     {
-        get;
+        get; 
         set;
     }
 }

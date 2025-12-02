@@ -1,20 +1,33 @@
 ﻿namespace Nastaran_bot.Contracts.User;
 
+/// <summary>
+/// Data transfer object representing a user's configurable content and notification preferences.
+/// Mirrors the structure of <see cref="Models.Preferences"/>.
+/// </summary>
 public class PreferencesDto
 {
-    public bool? DailyMusic
+    /// <summary>
+    /// Indicates whether the user receives a daily music recommendation.
+    /// </summary>
+    public bool DailyMusic
     {
         get;
         set;
     }
 
-    public bool? DailyQuote
+    /// <summary>
+    /// Indicates whether the user receives a daily quote.
+    /// </summary>
+    public bool DailyQuote
     {
-        get;
+        get; 
         set;
     }
 
-    public bool? WeatherUpdates
+    /// <summary>
+    /// Indicates whether the user receives weather updates.
+    /// </summary>
+    public bool WeatherUpdates
     {
         get;
         set;
