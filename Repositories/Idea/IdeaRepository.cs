@@ -21,26 +21,6 @@ public class IdeaRepository : IIdeaRepository
     }
 
     /// <inheritdoc />
-    public async Task AddAsync(Models.Idea entity, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-        await _ideas.InsertOneAsync(entity, cancellationToken: cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return false;
-        }
-
-        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
-        DeleteResult result = await _ideas.DeleteOneAsync(filter, cancellationToken);
-        return result.DeletedCount > 0;
-    }
-
-    /// <inheritdoc />
     public IAsyncEnumerable<Models.Idea> GetAllAsync(CancellationToken cancellationToken = default)
         => _ideas.Find(_ => true).ToAsyncEnumerable();
 
@@ -59,8 +39,7 @@ public class IdeaRepository : IIdeaRepository
     /// <inheritdoc />
     public IAsyncEnumerable<Models.Idea> GetByTelegramIdAsync(long telegramId, CancellationToken cancellationToken = default)
     {
-        FilterDefinition<Models.Idea> filter =
-            Builders<Models.Idea>.Filter.Eq(x => x.TelegramId, telegramId);
+        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.TelegramId, telegramId);
 
         return _ideas.Find(filter).ToAsyncEnumerable();
     }
@@ -73,6 +52,13 @@ public class IdeaRepository : IIdeaRepository
         ArgumentNullException.ThrowIfNull(predicate);
 
         return _ideas.Find(predicate).ToAsyncEnumerable();
+    }
+
+    /// <inheritdoc />
+    public async Task AddAsync(Models.Idea entity, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        await _ideas.InsertOneAsync(entity, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -90,5 +76,18 @@ public class IdeaRepository : IIdeaRepository
         {
             throw new InvalidOperationException($"Idea with Id '{entity.Id}' was not found.");
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return false;
+        }
+
+        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
+        DeleteResult result = await _ideas.DeleteOneAsync(filter, cancellationToken);
+        return result.DeletedCount > 0;
     }
 }
