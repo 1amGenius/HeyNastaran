@@ -5,68 +5,90 @@ using MongoDB.Driver.Linq;
 
 namespace Nastaran_bot.Repositories.Idea;
 
+/// <summary>
+/// MongoDB-backed implementation of the Idea repository.
+/// </summary>
 public class IdeaRepository : IIdeaRepository
 {
     private readonly IMongoCollection<Models.Idea> _ideas;
 
     public IdeaRepository(IMongoClient client)
     {
+        ArgumentNullException.ThrowIfNull(client);
+
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
         _ideas = database.GetCollection<Models.Idea>("ideas");
     }
 
-    public async Task CreateAsync(Models.Idea entity)
+    /// <inheritdoc />
+    public async Task AddAsync(Models.Idea entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-
-        await _ideas.InsertOneAsync(entity);
+        await _ideas.InsertOneAsync(entity, cancellationToken: cancellationToken);
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(id))
+        if (string.IsNullOrWhiteSpace(id))
         {
             return false;
         }
 
-        DeleteResult result = await _ideas.DeleteOneAsync(n => n.Id == id);
+        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
+        DeleteResult result = await _ideas.DeleteOneAsync(filter, cancellationToken);
         return result.DeletedCount > 0;
     }
 
-    public async Task<IEnumerable<Models.Idea>> FindAsync(Expression<Func<Models.Idea, bool>> filter)
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Idea> GetAllAsync(CancellationToken cancellationToken = default)
+        => _ideas.Find(_ => true).ToAsyncEnumerable();
+
+    /// <inheritdoc />
+    public async Task<Models.Idea> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(filter);
-        return await _ideas.AsQueryable().Where(filter).ToListAsync();
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return null;
+        }
+
+        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
+        return await _ideas.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Models.Idea>> FindAllAsync()
-        => await _ideas.Find(_ => true).ToListAsync();
-
-    public async Task<Models.Idea> FindByIdAsync(string id)
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Idea> GetByTelegramIdAsync(long telegramId, CancellationToken cancellationToken = default)
     {
-        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(n => n.Id, id);
-        return await _ideas.Find(filter).FirstOrDefaultAsync();
+        FilterDefinition<Models.Idea> filter =
+            Builders<Models.Idea>.Filter.Eq(x => x.TelegramId, telegramId);
+
+        return _ideas.Find(filter).ToAsyncEnumerable();
     }
 
-    public async Task<IEnumerable<Models.Idea>> FindByTelegramIdAsync(long telegramId)
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Idea> QueryAsync(
+        Expression<Func<Models.Idea, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
-        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq("telegramId", telegramId);
-        return await _ideas.Find(filter).ToListAsync();
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        return _ideas.Find(predicate).ToAsyncEnumerable();
     }
 
-    public async Task UpdateAsync(Models.Idea entity)
+    /// <inheritdoc />
+    public async Task UpdateAsync(Models.Idea entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
 
         entity.UpdatedAt = DateTime.UtcNow;
 
-        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(n => n.Id, entity.Id);
-        ReplaceOneResult result = await _ideas.ReplaceOneAsync(filter, entity);
+        FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, entity.Id);
+        ReplaceOneResult result = await _ideas.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
 
         if (result.MatchedCount == 0)
         {
-            throw new InvalidOperationException($"Idea with Id {entity.Id} was not found.");
+            throw new InvalidOperationException($"Idea with Id '{entity.Id}' was not found.");
         }
     }
 }
