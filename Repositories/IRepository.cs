@@ -3,54 +3,63 @@
 namespace Nastaran_bot.Repositories;
 
 /// <summary>
-/// Defines a generic repository abstraction for CRUD operations and filtered queries.
+/// Provides a generic abstraction for async CRUD operations and Telegram-oriented queries.
 /// </summary>
-/// <typeparam name="T">Entity type stored in the repository.</typeparam>
-public interface IRepository<T> where T : class
+/// <typeparam name="TEntity">The entity type managed by the repository.</typeparam>
+public interface IRepository<TEntity> where TEntity : class
 {
     /// <summary>
-    /// Retrieves all entities.
+    /// Retrieves all entities stored in the repository.
     /// </summary>
-    /// <returns>All entities in the repository.</returns>
-    public Task<IEnumerable<T>> FindAllAsync();
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    /// <returns>An asynchronous stream of all entities.</returns>
+    public IAsyncEnumerable<TEntity> GetAllAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves a single entity by its unique identifier.
+    /// Retrieves an entity by its unique identifier.
     /// </summary>
-    /// <param name="id">Entity identifier.</param>
-    /// <returns>The matching entity, or null if not found.</returns>
-    public Task<T> FindByIdAsync(string id);
+    /// <param name="id">The entity identifier.</param>
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    /// <returns>The matching entity, or null if no match is found.</returns>
+    public Task<TEntity> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves entities associated with a specific Telegram ID.
+    /// Retrieves all entities associated with a specific Telegram user ID.
     /// </summary>
-    /// <param name="telegramId">Telegram user ID linked to the entities.</param>
-    /// <returns>Matching entities.</returns>
-    public Task<IEnumerable<T>> FindByTelegramIdAsync(long telegramId);
+    /// <param name="telegramId">The Telegram user identifier.</param>
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    /// <returns>An asynchronous stream of matching entities.</returns>
+    public IAsyncEnumerable<TEntity> GetByTelegramIdAsync(long telegramId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves entities matching the provided filter expression.
+    /// Retrieves entities that satisfy the specified filter expression.
     /// </summary>
-    /// <param name="filter">Expression defining query conditions.</param>
-    /// <returns>Matching entities.</returns>
-    public Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter);
+    /// <param name="predicate">An expression defining the filtering criteria.</param>
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    /// <returns>An asynchronous stream of matching entities.</returns>
+    public IAsyncEnumerable<TEntity> QueryAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a new entity in the repository.
+    /// Inserts a new entity into the repository.
     /// </summary>
-    /// <param name="entity">Entity to add.</param>
-    public Task CreateAsync(T entity);
+    /// <param name="entity">The entity to insert.</param>
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Updates an existing entity.
+    /// Updates an existing entity in the repository.
     /// </summary>
-    /// <param name="entity">Entity with updated values.</param>
-    public Task UpdateAsync(T entity);
+    /// <param name="entity">The entity containing updated values.</param>
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes an entity by its identifier.
     /// </summary>
-    /// <param name="id">Identifier of the entity to delete.</param>
-    /// <returns>True if deletion succeeded; otherwise false.</returns>
-    public Task<bool> DeleteAsync(string id);
+    /// <param name="id">The identifier of the entity to delete.</param>
+    /// <param name="cancellationToken">Token for cancelling the operation.</param>
+    /// <returns>True if deletion succeeds; otherwise false.</returns>
+    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
 }
