@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 namespace Nastaran_bot.Repositories.Inspiration;
 

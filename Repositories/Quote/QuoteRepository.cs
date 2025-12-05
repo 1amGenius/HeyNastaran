@@ -1,72 +1,97 @@
 ﻿using System.Linq.Expressions;
 
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 namespace Nastaran_bot.Repositories.Quote;
 
+/// <summary>
+/// MongoDB-backed implementation of the Quote repository.
+/// </summary>
 public class QuoteRepository : IQuoteRepository
 {
     private readonly IMongoCollection<Models.Quote> _quotes;
 
     public QuoteRepository(IMongoClient client)
     {
+        ArgumentNullException.ThrowIfNull(client);
+
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
         _quotes = database.GetCollection<Models.Quote>("quotes");
     }
 
-    public async Task CreateAsync(Models.Quote entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Quote> GetAllAsync(CancellationToken cancellationToken = default)
+        => _quotes.Find(_ => true).ToAsyncEnumerable();
 
-        await _quotes.InsertOneAsync(entity);
-    }
-
-    public async Task<bool> DeleteAsync(string id)
+    /// <inheritdoc />
+    public async Task<Models.Quote> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(id))
+        if (string.IsNullOrWhiteSpace(id))
         {
-            return false;
+            return null;
         }
 
-        DeleteResult result = await _quotes.DeleteOneAsync(n => n.Id == id);
-        return result.DeletedCount > 0;
+        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
+
+        return await _quotes.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Models.Quote>> FindAsync(Expression<Func<Models.Quote, bool>> filter)
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Quote> GetByTelegramIdAsync(
+        long telegramId,
+        CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(filter);
-        return await _quotes.AsQueryable().Where(filter).ToListAsync();
+        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.TelegramId, telegramId);
+
+        return _quotes.Find(filter).ToAsyncEnumerable();
     }
 
-    public async Task<IEnumerable<Models.Quote>> FindAllAsync()
-        => await _quotes.Find(_ => true).ToListAsync();
-
-    public async Task<Models.Quote> FindByIdAsync(string id)
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Quote> QueryAsync(
+        Expression<Func<Models.Quote, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
-        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(n => n.Id, id);
-        return await _quotes.Find(filter).FirstOrDefaultAsync();
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        return _quotes.Find(predicate).ToAsyncEnumerable();
     }
 
-    public async Task<IEnumerable<Models.Quote>> FindByTelegramIdAsync(long telegramId)
+    /// <inheritdoc />
+    public async Task AddAsync(Models.Quote entity, CancellationToken cancellationToken = default)
     {
-        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq("telegramId", telegramId);
-        return await _quotes.Find(filter).ToListAsync();
+        ArgumentNullException.ThrowIfNull(entity);
+        await _quotes.InsertOneAsync(entity, cancellationToken: cancellationToken);
     }
 
-    public async Task UpdateAsync(Models.Quote entity)
+    /// <inheritdoc />
+    public async Task UpdateAsync(Models.Quote entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
 
         entity.UpdatedAt = DateTime.UtcNow;
 
-        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(n => n.Id, entity.Id);
-        ReplaceOneResult result = await _quotes.ReplaceOneAsync(filter, entity);
+        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, entity.Id);
+
+        ReplaceOneResult result = await _quotes.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
 
         if (result.MatchedCount == 0)
         {
-            throw new InvalidOperationException($"Quote with Id {entity.Id} was not found.");
+            throw new InvalidOperationException($"Quote with Id '{entity.Id}' was not found.");
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return false;
+        }
+
+        FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
+
+        DeleteResult result = await _quotes.DeleteOneAsync(filter, cancellationToken);
+        return result.DeletedCount > 0;
     }
 }
