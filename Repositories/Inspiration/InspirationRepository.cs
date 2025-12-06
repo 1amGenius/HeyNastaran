@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 using MongoDB.Driver;
 
@@ -20,8 +21,19 @@ public class InspirationRepository : IInspirationRepository
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Inspiration> GetAllAsync(CancellationToken cancellationToken = default)
-        => _inspirations.Find(_ => true).ToAsyncEnumerable();
+    public async IAsyncEnumerable<Models.Inspiration> GetAllAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        using IAsyncCursor<Models.Inspiration> cursor = await _inspirations.FindAsync(_ => true, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Inspiration inspiration in cursor.Current)
+            {
+                yield return inspiration;
+            }
+        }
+    }
 
     /// <inheritdoc />
     public async Task<Models.Inspiration> GetByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -33,33 +45,50 @@ public class InspirationRepository : IInspirationRepository
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 
-        return await _inspirations.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        return await _inspirations.Find(filter).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Inspiration> GetByTelegramIdAsync(
+    public async IAsyncEnumerable<Models.Inspiration> GetByTelegramIdAsync(
         long telegramId,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.TelegramId, telegramId);
 
-        return _inspirations.Find(filter).ToAsyncEnumerable();
+        using IAsyncCursor<Models.Inspiration> cursor = await _inspirations.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Inspiration inspiration in cursor.Current)
+            {
+                yield return inspiration;
+            }
+        }
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Inspiration> QueryAsync(
+    public async IAsyncEnumerable<Models.Inspiration> QueryAsync(
         Expression<Func<Models.Inspiration, bool>> predicate,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return _inspirations.Find(predicate).ToAsyncEnumerable();
+
+        using IAsyncCursor<Models.Inspiration> cursor = await _inspirations.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Inspiration inspiration in cursor.Current)
+            {
+                yield return inspiration;
+            }
+        }
     }
 
     /// <inheritdoc />
     public async Task AddAsync(Models.Inspiration entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        await _inspirations.InsertOneAsync(entity, cancellationToken: cancellationToken);
+        await _inspirations.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -72,7 +101,7 @@ public class InspirationRepository : IInspirationRepository
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, entity.Id);
 
-        ReplaceOneResult result = await _inspirations.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
+        ReplaceOneResult result = await _inspirations.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (result.MatchedCount == 0)
         {
@@ -90,7 +119,7 @@ public class InspirationRepository : IInspirationRepository
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 
-        DeleteResult result = await _inspirations.DeleteOneAsync(filter, cancellationToken);
+        DeleteResult result = await _inspirations.DeleteOneAsync(filter, cancellationToken).ConfigureAwait(false);
         return result.DeletedCount > 0;
     }
 }

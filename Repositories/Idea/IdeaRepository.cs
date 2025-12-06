@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 using MongoDB.Driver;
 
@@ -20,8 +21,19 @@ public class IdeaRepository : IIdeaRepository
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Idea> GetAllAsync(CancellationToken cancellationToken = default)
-        => _ideas.Find(_ => true).ToAsyncEnumerable();
+    public async IAsyncEnumerable<Models.Idea> GetAllAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        using IAsyncCursor<Models.Idea> cursor = await _ideas.FindAsync(_ => true, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Idea idea in cursor.Current)
+            {
+                yield return idea;
+            }
+        }
+    }
 
     /// <inheritdoc />
     public async Task<Models.Idea> GetByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -32,32 +44,51 @@ public class IdeaRepository : IIdeaRepository
         }
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
-        return await _ideas.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        
+        return await _ideas.Find(filter).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Idea> GetByTelegramIdAsync(long telegramId, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<Models.Idea> GetByTelegramIdAsync(
+        long telegramId,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.TelegramId, telegramId);
 
-        return _ideas.Find(filter).ToAsyncEnumerable();
+        using IAsyncCursor<Models.Idea> cursor = await _ideas.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Idea idea in cursor.Current)
+            {
+                yield return idea;
+            }
+        }
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Idea> QueryAsync(
+    public async IAsyncEnumerable<Models.Idea> QueryAsync(
         Expression<Func<Models.Idea, bool>> predicate,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
-        return _ideas.Find(predicate).ToAsyncEnumerable();
+        using IAsyncCursor<Models.Idea> cursor = await _ideas.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Idea idea in cursor.Current)
+            {
+                yield return idea;
+            }
+        }
     }
 
     /// <inheritdoc />
     public async Task AddAsync(Models.Idea entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        await _ideas.InsertOneAsync(entity, cancellationToken: cancellationToken);
+        await _ideas.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -69,7 +100,8 @@ public class IdeaRepository : IIdeaRepository
         entity.UpdatedAt = DateTime.UtcNow;
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, entity.Id);
-        ReplaceOneResult result = await _ideas.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
+
+        ReplaceOneResult result = await _ideas.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (result.MatchedCount == 0)
         {
@@ -86,7 +118,8 @@ public class IdeaRepository : IIdeaRepository
         }
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
-        DeleteResult result = await _ideas.DeleteOneAsync(filter, cancellationToken);
+
+        DeleteResult result = await _ideas.DeleteOneAsync(filter, cancellationToken).ConfigureAwait(false);
         return result.DeletedCount > 0;
     }
 }

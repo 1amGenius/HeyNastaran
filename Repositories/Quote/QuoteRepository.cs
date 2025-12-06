@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 using MongoDB.Driver;
 
@@ -20,8 +21,19 @@ public class QuoteRepository : IQuoteRepository
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Quote> GetAllAsync(CancellationToken cancellationToken = default)
-        => _quotes.Find(_ => true).ToAsyncEnumerable();
+    public async IAsyncEnumerable<Models.Quote> GetAllAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        using IAsyncCursor<Models.Quote> cursor = await _quotes.FindAsync(_ => true, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Quote quote in cursor.Current)
+            {
+                yield return quote;
+            }
+        }
+    }
 
     /// <inheritdoc />
     public async Task<Models.Quote> GetByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -33,27 +45,43 @@ public class QuoteRepository : IQuoteRepository
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
 
-        return await _quotes.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        return await _quotes.Find(filter).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Quote> GetByTelegramIdAsync(
+    public async IAsyncEnumerable<Models.Quote> GetByTelegramIdAsync(
         long telegramId,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.TelegramId, telegramId);
 
-        return _quotes.Find(filter).ToAsyncEnumerable();
+        using IAsyncCursor<Models.Quote> cursor = await _quotes.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Quote quote in cursor.Current)
+            {
+                yield return quote;
+            }
+        }
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.Quote> QueryAsync(
+    public async IAsyncEnumerable<Models.Quote> QueryAsync(
         Expression<Func<Models.Quote, bool>> predicate,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
-        return _quotes.Find(predicate).ToAsyncEnumerable();
+        using IAsyncCursor<Models.Quote> cursor = await _quotes.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.Quote quote in cursor.Current)
+            {
+                yield return quote;
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -73,7 +101,7 @@ public class QuoteRepository : IQuoteRepository
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, entity.Id);
 
-        ReplaceOneResult result = await _quotes.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
+        ReplaceOneResult result = await _quotes.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (result.MatchedCount == 0)
         {
@@ -91,7 +119,7 @@ public class QuoteRepository : IQuoteRepository
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
 
-        DeleteResult result = await _quotes.DeleteOneAsync(filter, cancellationToken);
+        DeleteResult result = await _quotes.DeleteOneAsync(filter, cancellationToken).ConfigureAwait(false);
         return result.DeletedCount > 0;
     }
 }

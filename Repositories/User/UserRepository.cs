@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -21,8 +22,19 @@ public class UserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.User> GetAllAsync(CancellationToken cancellationToken = default)
-        => _users.Find(_ => true).ToAsyncEnumerable();
+    public async IAsyncEnumerable<Models.User> GetAllAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        using IAsyncCursor<Models.User> cursor = await _users.FindAsync(_ => true, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.User user in cursor.Current)
+            {
+                yield return user;
+            }
+        }
+    }
 
     /// <inheritdoc />
     public async Task<Models.User> GetByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -34,33 +46,50 @@ public class UserRepository : IUserRepository
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 
-        return await _users.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        return await _users.Find(filter).FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.User> GetByTelegramIdAsync(
+    public async IAsyncEnumerable<Models.User> GetByTelegramIdAsync(
         long telegramId,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.TelegramId, telegramId);
 
-        return _users.Find(filter).ToAsyncEnumerable();
+        using IAsyncCursor<Models.User> cursor = await _users.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.User user in cursor.Current)
+            {
+                yield return user;
+            }
+        }
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<Models.User> QueryAsync(
+    public async IAsyncEnumerable<Models.User> QueryAsync(
         Expression<Func<Models.User, bool>> predicate,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return _users.Find(predicate).ToAsyncEnumerable();
+
+        using IAsyncCursor<Models.User> cursor = await _users.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (Models.User user in cursor.Current)
+            {
+                yield return user;
+            }
+        }
     }
 
     /// <inheritdoc />
     public async Task AddAsync(Models.User entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        await _users.InsertOneAsync(entity, cancellationToken: cancellationToken);
+        await _users.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -73,7 +102,7 @@ public class UserRepository : IUserRepository
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, entity.Id);
 
-        ReplaceOneResult result = await _users.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken);
+        ReplaceOneResult result = await _users.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (result.MatchedCount == 0)
         {
@@ -91,7 +120,7 @@ public class UserRepository : IUserRepository
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 
-        DeleteResult result = await _users.DeleteOneAsync(filter, cancellationToken: cancellationToken);
+        DeleteResult result = await _users.DeleteOneAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
         return result.DeletedCount > 0;
     }
 }
