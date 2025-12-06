@@ -2,77 +2,57 @@
 
 namespace Nastaran_bot.Services.Idea;
 
-public class IdeaService(IIdeaRepository ideaRepository, ILogger<IdeaService> logger) : IIdeaService
+/// <summary>
+/// Provides high-level operations for creating, retrieving, and managing <see cref="Models.Idea"/>.
+/// Encapsulates business logic, logging, and cancellation-aware execution over the repository layer.
+/// </summary>
+public class IdeaService(IIdeaRepository ideaRepository) : IIdeaService
 {
     private readonly IIdeaRepository _ideaRepository = ideaRepository;
-    private readonly ILogger<IdeaService> _logger = logger;
 
+    /// <inheritdoc />
     public async Task<Models.Idea> AddIdeaAsync(
         long telegramId,
         string content,
-        string label = "idea",
+        string label = null,
         List<string> tags = null,
-        bool favorite = false)
+        bool favorite = false,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var newIdea = new Models.Idea
-            {
-                TelegramId = telegramId,
-                Content = content,
-                Label = label,
-                Tags = tags ?? [],
-                Favorite = favorite,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-            };
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(content);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
 
-            await _ideaRepository.CreateAsync(newIdea);
-            return newIdea;
-        }
-        catch (Exception ex)
+        var idea = new Models.Idea
         {
-            _logger.LogError(ex, "Error adding idea for TelegramId {telegramId}", telegramId);
-            throw;
-        }
+            TelegramId = telegramId,
+            Content = content,
+            Label = label ?? "idea",
+            Tags = tags ?? [],
+            Favorite = favorite,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await _ideaRepository.AddAsync(idea, cancellationToken).ConfigureAwait(false);
+
+        return idea;
     }
 
-    public async Task<IEnumerable<Models.Idea>> GetUserIdeasAsync(long telegramId)
-    {
-        try
-        {
-            return await _ideaRepository.FindByTelegramIdAsync(telegramId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching ideas for TelegramId {telegramId}", telegramId);
-            return [];
-        }
-    }
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Idea> GetUserIdeasAsync(long telegramId, CancellationToken cancellationToken = default) 
+        => telegramId <= 0
+            ? throw new ArgumentOutOfRangeException(nameof(telegramId), "TelegramId must be a positive number.")
+            : _ideaRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
 
-    public async Task<bool> DeleteIdeaAsync(string id)
-    {
-        try
-        {
-            return await _ideaRepository.DeleteAsync(id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting idea {id}", id);
-            return false;
-        }
-    }
+    /// <inheritdoc />
+    public async Task<bool> DeleteIdeaAsync(string id, CancellationToken cancellationToken = default) 
+        => string.IsNullOrWhiteSpace(id)
+            ? throw new FormatException("Idea ID cannot be null or empty.")
+            : await _ideaRepository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
-    public async Task<Models.Idea> GetIdeaByIdAsync(string id)
-    {
-        try
-        {
-            return await _ideaRepository.FindByIdAsync(id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting idea {id}", id);
-            return null;
-        }
-    }
+    /// <inheritdoc />
+    public async Task<Models.Idea> GetIdeaByIdAsync(string id, CancellationToken cancellationToken = default) 
+        => string.IsNullOrWhiteSpace(id)
+            ? throw new FormatException("Idea ID cannot be null or empty.")
+            : await _ideaRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
 }
