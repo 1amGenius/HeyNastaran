@@ -4,7 +4,7 @@ namespace Nastaran_bot.Services.Idea;
 
 /// <summary>
 /// Provides high-level operations for creating, retrieving, and managing <see cref="Models.Idea"/>.
-/// Encapsulates business logic, logging, and cancellation-aware execution over the repository layer.
+/// Encapsulates business logic and cancellation-aware execution over the repository layer.
 /// </summary>
 public class IdeaService(IIdeaRepository ideaRepository) : IIdeaService
 {

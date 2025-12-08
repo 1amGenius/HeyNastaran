@@ -2,6 +2,11 @@
 
 namespace Nastaran_bot.Services.Inspiration;
 
+/// <summary>
+/// Implements high-level inspiration management operations by coordinating This service
+/// encapsulates all application-facing logic for creating, retrieving,
+/// and deleting user inspiration items.
+/// </summary>
 public class InspirationService(IInspirationRepository inspirationRepository) : IInspirationService
 {
     private readonly IInspirationRepository _inspirationRepository = inspirationRepository;
