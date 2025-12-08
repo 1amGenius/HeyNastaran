@@ -2,77 +2,61 @@
 
 namespace Nastaran_bot.Services.Quote;
 
-public class QuoteService(IQuoteRepository quoteRepository, ILogger<QuoteService> logger) : IQuoteService
+/// <summary>
+/// Implements high-level quote management operations by coordinating This service
+/// encapsulates all application-facing logic for creating, retrieving,
+/// and deleting user quote items.
+/// </summary>
+public class QuoteService(IQuoteRepository quoteRepository) : IQuoteService
 {
     private readonly IQuoteRepository _quoteRepository = quoteRepository;
-    private readonly ILogger<QuoteService> _logger = logger;
 
-    public async Task<Models.Quote> AddNoteAsync(
+    /// <inheritdoc />
+    public async Task<Models.Quote> AddQuoteAsync(
         long telegramId,
         string text,
         string category = "general",
-        string author = "unknown")
+        string author = "unknown",
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var newNote = new Models.Quote
-            {
-                TelegramId = telegramId,
-                Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
-                Text = text,
-                Category = category,
-                Author = author,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                UsedAt = null,
-            };
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
 
-            await _quoteRepository.CreateAsync(newNote);
-            return newNote;
-        }
-        catch (Exception ex)
+        if (string.IsNullOrWhiteSpace(text))
         {
-            _logger.LogError(ex, "Error adding daily note for TelegramId {telegramId}", telegramId);
-            throw;
+            ArgumentException.ThrowIfNullOrWhiteSpace(text);
         }
+
+        var newNote = new Models.Quote
+        {
+            TelegramId = telegramId,
+            Date = DateTime.UtcNow.ToString("yyyy-MM-dd"),
+            Text = text,
+            Category = category,
+            Author = author,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            UsedAt = null,
+        };
+
+        await _quoteRepository.AddAsync(newNote, cancellationToken).ConfigureAwait(false);
+        return newNote;
     }
 
-    public async Task<IEnumerable<Models.Quote>> GetUserNotesAsync(long telegramId)
-    {
-        try
-        {
-            return await _quoteRepository.FindByTelegramIdAsync(telegramId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching notes for TelegramId {telegramId}", telegramId);
-            return [];
-        }
-    }
+    /// <inheritdoc />
+    public IAsyncEnumerable<Models.Quote> GetUserQuotesAsync(long telegramId, CancellationToken cancellationToken = default) 
+        => telegramId <= 0
+            ? throw new ArgumentOutOfRangeException(nameof(telegramId), "TelegramId must be a positive number.")
+            : _quoteRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
 
-    public async Task<bool> DeleteNoteAsync(string id)
-    {
-        try
-        {
-            return await _quoteRepository.DeleteAsync(id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting note {id}", id);
-            return false;
-        }
-    }
+    /// <inheritdoc />
+    public async Task<bool> DeleteQuoteAsync(string id, CancellationToken cancellationToken) 
+        => string.IsNullOrWhiteSpace(id)
+            ? throw new FormatException("Quote ID cannot be null or empty.")
+            : await _quoteRepository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
-    public async Task<Models.Quote> GetNoteByIdAsync(string id)
-    {
-        try
-        {
-            return await _quoteRepository.FindByIdAsync(id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting note {id}", id);
-            return null;
-        }
-    }
+    /// <inheritdoc />
+    public async Task<Models.Quote> GetQuoteByIdAsync(string id, CancellationToken cancellationToken = default)
+        => string.IsNullOrWhiteSpace(id)
+            ? throw new FormatException("Quote ID cannot be null or empty.")
+            : await _quoteRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
 }
