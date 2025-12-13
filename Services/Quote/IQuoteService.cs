@@ -14,6 +14,12 @@ public interface IQuoteService
     /// <param name="category">Optional / The genre of the quote</param>
     /// <param name="author">Optional / Who wrote this quote</param>
     /// <returns>The created <see cref="Models.Quote"/> instance.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if telegram ID is not a valid identifier (e.g., non-positive).
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the text is null, empty, or whitespace.
+    /// </exception>
     public Task<Models.Quote> AddQuoteAsync(
         long telegramId,
         string text,
@@ -27,6 +33,9 @@ public interface IQuoteService
     /// <param name="telegramId">Identifier of the user whose quotes will be returned.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A sequence of quotes for the user.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if telegram ID is not a valid identifier (e.g., non-positive).
+    /// </exception>
     public IAsyncEnumerable<Models.Quote> GetUserQuotesAsync(long telegramId, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -35,6 +44,9 @@ public interface IQuoteService
     /// <param name="id">The identifier of the quote to delete.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns><c>true</c> if the item was deleted; otherwise <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if the quote ID is null, empty, or whitespace.
+    /// </exception>
     public Task<bool> DeleteQuoteAsync(string id, CancellationToken cancellationToken);
 
     /// <summary>
@@ -46,5 +58,8 @@ public interface IQuoteService
     /// The matching <see cref="Models.Quote"/> instance,
     /// or <c>null</c> if not found.
     /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if the quote ID is null, empty, or whitespace.
+    /// </exception>
     public Task<Models.Quote> GetQuoteByIdAsync(string id, CancellationToken cancellationToken);
 }

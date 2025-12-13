@@ -48,12 +48,12 @@ public class QuoteService(IQuoteRepository quoteRepository) : IQuoteService
     /// <inheritdoc />
     public async Task<bool> DeleteQuoteAsync(string id, CancellationToken cancellationToken) 
         => string.IsNullOrWhiteSpace(id)
-            ? throw new FormatException("Quote ID cannot be null or empty.")
+            ? throw new ArgumentNullException(nameof(id), "Quote ID cannot be null or empty.")
             : await _quoteRepository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
     public async Task<Models.Quote> GetQuoteByIdAsync(string id, CancellationToken cancellationToken = default)
         => string.IsNullOrWhiteSpace(id)
-            ? throw new FormatException("Quote ID cannot be null or empty.")
+            ? throw new ArgumentNullException(nameof(id), "Quote ID cannot be null or empty.")
             : await _quoteRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
 }

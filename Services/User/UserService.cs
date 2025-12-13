@@ -61,13 +61,13 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> GetUserByIdAsync(string id, CancellationToken cancellationToken = default)
         => string.IsNullOrWhiteSpace(id)
-            ? throw new ArgumentNullException(nameof(id))
+            ? throw new ArgumentNullException(nameof(id), "User ID cannot be null or empty")
             : await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
     public async Task<bool> DeleteUserAsync(string id, CancellationToken cancellationToken = default)
         => string.IsNullOrWhiteSpace(id)
-            ? throw new ArgumentNullException(nameof(id))
+            ? throw new ArgumentNullException(nameof(id), "User ID cannot be null or empty")
             : await _userRepository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
