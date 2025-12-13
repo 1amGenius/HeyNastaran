@@ -21,10 +21,7 @@ public class QuoteService(IQuoteRepository quoteRepository) : IQuoteService
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
 
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(text);
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
         var newNote = new Models.Quote
         {
