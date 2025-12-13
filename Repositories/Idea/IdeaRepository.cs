@@ -38,10 +38,7 @@ public class IdeaRepository : IIdeaRepository
     /// <inheritdoc />
     public async Task<Models.Idea> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return null;
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
         
@@ -53,6 +50,8 @@ public class IdeaRepository : IIdeaRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.TelegramId, telegramId);
 
         using IAsyncCursor<Models.Idea> cursor = await _ideas.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -88,6 +87,7 @@ public class IdeaRepository : IIdeaRepository
     public async Task AddAsync(Models.Idea entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
+
         await _ideas.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
@@ -95,7 +95,7 @@ public class IdeaRepository : IIdeaRepository
     public async Task UpdateAsync(Models.Idea entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
+        ArgumentException.ThrowIfNullOrWhiteSpace(entity.Id);
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -112,10 +112,7 @@ public class IdeaRepository : IIdeaRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return false;
-        }
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(id);
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
 
