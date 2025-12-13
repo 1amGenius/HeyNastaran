@@ -38,10 +38,7 @@ public class InspirationRepository : IInspirationRepository
     /// <inheritdoc />
     public async Task<Models.Inspiration> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return null;
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 
@@ -53,6 +50,8 @@ public class InspirationRepository : IInspirationRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.TelegramId, telegramId);
 
         using IAsyncCursor<Models.Inspiration> cursor = await _inspirations.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -88,6 +87,7 @@ public class InspirationRepository : IInspirationRepository
     public async Task AddAsync(Models.Inspiration entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
+
         await _inspirations.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
@@ -95,7 +95,7 @@ public class InspirationRepository : IInspirationRepository
     public async Task UpdateAsync(Models.Inspiration entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -112,10 +112,7 @@ public class InspirationRepository : IInspirationRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return false;
-        }
+        ArgumentException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 

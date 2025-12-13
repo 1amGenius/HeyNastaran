@@ -38,7 +38,7 @@ public class IdeaRepository : IIdeaRepository
     /// <inheritdoc />
     public async Task<Models.Idea> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
         
@@ -95,7 +95,7 @@ public class IdeaRepository : IIdeaRepository
     public async Task UpdateAsync(Models.Idea entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrWhiteSpace(entity.Id);
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -112,7 +112,7 @@ public class IdeaRepository : IIdeaRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentNullException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
 
