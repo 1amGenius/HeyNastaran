@@ -38,10 +38,7 @@ public class QuoteRepository : IQuoteRepository
     /// <inheritdoc />
     public async Task<Models.Quote> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return null;
-        }
+        ArgumentException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
 
@@ -53,6 +50,8 @@ public class QuoteRepository : IQuoteRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.TelegramId, telegramId);
 
         using IAsyncCursor<Models.Quote> cursor = await _quotes.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -88,6 +87,7 @@ public class QuoteRepository : IQuoteRepository
     public async Task AddAsync(Models.Quote entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
+
         await _quotes.InsertOneAsync(entity, cancellationToken: cancellationToken);
     }
 
@@ -95,7 +95,7 @@ public class QuoteRepository : IQuoteRepository
     public async Task UpdateAsync(Models.Quote entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -112,10 +112,7 @@ public class QuoteRepository : IQuoteRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return false;
-        }
+        ArgumentNullException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
 
