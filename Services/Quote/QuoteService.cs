@@ -41,7 +41,7 @@ public class QuoteService(IQuoteRepository quoteRepository) : IQuoteService
 
     /// <inheritdoc />
     public IAsyncEnumerable<Models.Quote> GetUserQuotesAsync(long telegramId, CancellationToken cancellationToken = default) 
-        => telegramId <= 0
+        => telegramId is <= 0
             ? throw new ArgumentOutOfRangeException(nameof(telegramId), "TelegramId must be a positive number.")
             : _quoteRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
 

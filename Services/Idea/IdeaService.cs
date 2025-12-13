@@ -40,7 +40,7 @@ public class IdeaService(IIdeaRepository ideaRepository) : IIdeaService
 
     /// <inheritdoc />
     public IAsyncEnumerable<Models.Idea> GetUserIdeasAsync(long telegramId, CancellationToken cancellationToken = default) 
-        => telegramId <= 0
+        => telegramId is <= 0
             ? throw new ArgumentOutOfRangeException(nameof(telegramId), "TelegramId must be a positive number.")
             : _ideaRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
 

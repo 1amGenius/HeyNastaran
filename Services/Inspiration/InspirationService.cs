@@ -44,7 +44,7 @@ public class InspirationService(IInspirationRepository inspirationRepository) : 
 
     /// <inheritdoc />
     public IAsyncEnumerable<Models.Inspiration> GetUserInspirationsAsync(long telegramId, CancellationToken cancellationToken = default) 
-        => telegramId <= 0
+        => telegramId is <= 0
             ? throw new ArgumentOutOfRangeException(nameof(telegramId), "TelegramId must be a positive number.")
             : _inspirationRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
 
