@@ -39,10 +39,7 @@ public class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task<Models.User> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return null;
-        }
+        ArgumentException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 
@@ -54,6 +51,8 @@ public class UserRepository : IUserRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.TelegramId, telegramId);
 
         using IAsyncCursor<Models.User> cursor = await _users.FindAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -89,6 +88,7 @@ public class UserRepository : IUserRepository
     public async Task AddAsync(Models.User entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
+
         await _users.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
@@ -96,7 +96,7 @@ public class UserRepository : IUserRepository
     public async Task UpdateAsync(Models.User entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -113,10 +113,7 @@ public class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            return false;
-        }
+        ArgumentNullException.ThrowIfNullOrEmpty(id);
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 
