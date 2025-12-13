@@ -17,6 +17,12 @@ public interface IInspirationService
     /// <param name="favorite">Indicates whether the item is marked as a favorite.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created <see cref="Models.Inspiration"/> instance.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if Telegram ID is not a valid identifier (e.g., non-positive).
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown if caption or imageFileId is null, whitespace or empty.
+    /// </exception>
     public Task<Models.Inspiration> AddInspirationAsync(
         long telegramId,
         string caption,
@@ -32,6 +38,9 @@ public interface IInspirationService
     /// <param name="telegramId">Identifier of the user whose inspirations will be returned.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A sequence of inspirations for the user.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if Telegram ID is not a valid identifier (e.g., non-positive).
+    /// </exception>
     public IAsyncEnumerable<Models.Inspiration> GetUserInspirationsAsync(long telegramId, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -40,6 +49,9 @@ public interface IInspirationService
     /// <param name="id">The identifier of the inspiration to delete.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns><c>true</c> if the item was deleted; otherwise <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if the provided inspiration ID is null, empty, or whitespace.
+    /// </exception>
     public Task<bool> DeleteInspirationAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -51,5 +63,8 @@ public interface IInspirationService
     /// The matching <see cref="Models.Inspiration"/> instance,
     /// or <c>null</c> if not found.
     /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if the provided inspiration ID is null, empty, or whitespace.
+    /// </exception>
     public Task<Models.Inspiration> GetInspirationByIdAsync(string id, CancellationToken cancellationToken = default);
 }

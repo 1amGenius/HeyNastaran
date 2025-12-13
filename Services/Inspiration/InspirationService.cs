@@ -16,22 +16,14 @@ public class InspirationService(IInspirationRepository inspirationRepository) : 
         long telegramId,
         string caption,
         string imageFileId,
-        string label,
+        string label = null,
         List<string> tags = null,
         bool favorite = false,
         CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
-
-        if (string.IsNullOrWhiteSpace(caption))
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(caption);
-        }
-
-        if (string.IsNullOrWhiteSpace(imageFileId))
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(imageFileId);
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(caption);
+        ArgumentException.ThrowIfNullOrWhiteSpace(imageFileId);
 
         var newInspiration = new Models.Inspiration
         {
@@ -57,13 +49,14 @@ public class InspirationService(IInspirationRepository inspirationRepository) : 
             : _inspirationRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
 
     /// <inheritdoc />
-    public async Task<bool> DeleteInspirationAsync(string id, CancellationToken cancellationToken) => string.IsNullOrWhiteSpace(id)
-            ? throw new FormatException("Inspiration ID cannot be null or empty.")
+    public async Task<bool> DeleteInspirationAsync(string id, CancellationToken cancellationToken) 
+        => string.IsNullOrWhiteSpace(id)
+            ? throw new ArgumentNullException(nameof(id), "Inspiration ID cannot be null or empty.")
             : await _inspirationRepository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
     public async Task<Models.Inspiration> GetInspirationByIdAsync(string id, CancellationToken cancellationToken = default) 
         => string.IsNullOrWhiteSpace(id)
-            ? throw new FormatException("Inspiration ID cannot be null or empty.")
+            ? throw new ArgumentNullException(nameof(id), "Inspiration ID cannot be null or empty.")
             : await _inspirationRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
 }
