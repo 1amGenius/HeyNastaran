@@ -103,7 +103,7 @@ public class InspirationRepository : IInspirationRepository
 
         ReplaceOneResult result = await _inspirations.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (result.MatchedCount == 0)
+        if (result.MatchedCount is 0)
         {
             throw new InvalidOperationException($"Inspiration with Id '{entity.Id}' was not found.");
         }
@@ -117,6 +117,6 @@ public class InspirationRepository : IInspirationRepository
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 
         DeleteResult result = await _inspirations.DeleteOneAsync(filter, cancellationToken).ConfigureAwait(false);
-        return result.DeletedCount > 0;
+        return result.DeletedCount is > 0;
     }
 }

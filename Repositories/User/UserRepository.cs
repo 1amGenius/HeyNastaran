@@ -104,7 +104,7 @@ public class UserRepository : IUserRepository
 
         ReplaceOneResult result = await _users.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (result.MatchedCount == 0)
+        if (result.MatchedCount is 0)
         {
             throw new InvalidOperationException($"User with Id '{entity.Id}' was not found.");
         }
@@ -118,6 +118,6 @@ public class UserRepository : IUserRepository
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 
         DeleteResult result = await _users.DeleteOneAsync(filter, cancellationToken: cancellationToken).ConfigureAwait(false);
-        return result.DeletedCount > 0;
+        return result.DeletedCount is > 0;
     }
 }

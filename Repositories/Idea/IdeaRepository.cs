@@ -103,7 +103,7 @@ public class IdeaRepository : IIdeaRepository
 
         ReplaceOneResult result = await _ideas.ReplaceOneAsync(filter, entity, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (result.MatchedCount == 0)
+        if (result.MatchedCount is 0)
         {
             throw new InvalidOperationException($"Idea with Id '{entity.Id}' was not found.");
         }
@@ -117,6 +117,6 @@ public class IdeaRepository : IIdeaRepository
         FilterDefinition<Models.Idea> filter = Builders<Models.Idea>.Filter.Eq(x => x.Id, id);
 
         DeleteResult result = await _ideas.DeleteOneAsync(filter, cancellationToken).ConfigureAwait(false);
-        return result.DeletedCount > 0;
+        return result.DeletedCount is > 0;
     }
 }
