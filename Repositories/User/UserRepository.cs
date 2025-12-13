@@ -15,7 +15,7 @@ public class UserRepository : IUserRepository
         
     public UserRepository(IMongoClient client)
     {
-        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(client, nameof(client));
 
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
         _users = database.GetCollection<Models.User>("users");
@@ -39,7 +39,7 @@ public class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task<Models.User> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentException.ThrowIfNullOrEmpty(id, nameof(id));
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 
@@ -51,7 +51,7 @@ public class UserRepository : IUserRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.TelegramId, telegramId);
 
@@ -71,7 +71,7 @@ public class UserRepository : IUserRepository
         Expression<Func<Models.User, bool>> predicate,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
 
         using IAsyncCursor<Models.User> cursor = await _users.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -87,7 +87,7 @@ public class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task AddAsync(Models.User entity, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         await _users.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
@@ -95,8 +95,8 @@ public class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task UpdateAsync(Models.User entity, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -113,7 +113,7 @@ public class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNullOrEmpty(id);
+        ArgumentNullException.ThrowIfNullOrEmpty(id, nameof(id));
 
         FilterDefinition<Models.User> filter = Builders<Models.User>.Filter.Eq(x => x.Id, id);
 

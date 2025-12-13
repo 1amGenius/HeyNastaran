@@ -14,7 +14,7 @@ public class QuoteRepository : IQuoteRepository
 
     public QuoteRepository(IMongoClient client)
     {
-        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(client, nameof(client));
 
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
         _quotes = database.GetCollection<Models.Quote>("quotes");
@@ -38,7 +38,7 @@ public class QuoteRepository : IQuoteRepository
     /// <inheritdoc />
     public async Task<Models.Quote> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentException.ThrowIfNullOrEmpty(id, nameof(id));
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
 
@@ -50,7 +50,7 @@ public class QuoteRepository : IQuoteRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.TelegramId, telegramId);
 
@@ -70,7 +70,7 @@ public class QuoteRepository : IQuoteRepository
         Expression<Func<Models.Quote, bool>> predicate,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
 
         using IAsyncCursor<Models.Quote> cursor = await _quotes.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -86,7 +86,7 @@ public class QuoteRepository : IQuoteRepository
     /// <inheritdoc />
     public async Task AddAsync(Models.Quote entity, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         await _quotes.InsertOneAsync(entity, cancellationToken: cancellationToken);
     }
@@ -94,8 +94,8 @@ public class QuoteRepository : IQuoteRepository
     /// <inheritdoc />
     public async Task UpdateAsync(Models.Quote entity, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -112,7 +112,7 @@ public class QuoteRepository : IQuoteRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNullOrEmpty(id);
+        ArgumentNullException.ThrowIfNullOrEmpty(id, nameof(id));
 
         FilterDefinition<Models.Quote> filter = Builders<Models.Quote>.Filter.Eq(x => x.Id, id);
 

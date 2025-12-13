@@ -14,7 +14,7 @@ public class InspirationRepository : IInspirationRepository
 
     public InspirationRepository(IMongoClient client)
     {
-        ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(client, nameof(client));
 
         IMongoDatabase database = client.GetDatabase("nastaranBotDb");
         _inspirations = database.GetCollection<Models.Inspiration>("inspirations");
@@ -38,7 +38,7 @@ public class InspirationRepository : IInspirationRepository
     /// <inheritdoc />
     public async Task<Models.Inspiration> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 
@@ -50,7 +50,7 @@ public class InspirationRepository : IInspirationRepository
         long telegramId,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.TelegramId, telegramId);
 
@@ -70,7 +70,7 @@ public class InspirationRepository : IInspirationRepository
         Expression<Func<Models.Inspiration, bool>> predicate,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate, nameof(predicate));
 
         using IAsyncCursor<Models.Inspiration> cursor = await _inspirations.FindAsync(predicate, cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -86,7 +86,7 @@ public class InspirationRepository : IInspirationRepository
     /// <inheritdoc />
     public async Task AddAsync(Models.Inspiration entity, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
 
         await _inspirations.InsertOneAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
@@ -94,8 +94,8 @@ public class InspirationRepository : IInspirationRepository
     /// <inheritdoc />
     public async Task UpdateAsync(Models.Inspiration entity, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(entity);
-        ArgumentException.ThrowIfNullOrEmpty(entity.Id);
+        ArgumentNullException.ThrowIfNull(entity, nameof(entity));
+        ArgumentException.ThrowIfNullOrEmpty(entity.Id, nameof(entity.Id));
 
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -112,7 +112,7 @@ public class InspirationRepository : IInspirationRepository
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentException.ThrowIfNullOrEmpty(id, nameof(id));
 
         FilterDefinition<Models.Inspiration> filter = Builders<Models.Inspiration>.Filter.Eq(x => x.Id, id);
 
