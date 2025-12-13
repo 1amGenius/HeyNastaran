@@ -21,9 +21,9 @@ public class InspirationService(IInspirationRepository inspirationRepository) : 
         bool favorite = false,
         CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(caption);
-        ArgumentException.ThrowIfNullOrWhiteSpace(imageFileId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(caption, nameof(caption));
+        ArgumentException.ThrowIfNullOrWhiteSpace(imageFileId, nameof(imageFileId));
 
         var newInspiration = new Models.Inspiration
         {

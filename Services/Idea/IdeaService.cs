@@ -19,8 +19,8 @@ public class IdeaService(IIdeaRepository ideaRepository) : IIdeaService
         bool favorite = false,
         CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(content);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
 
         var idea = new Models.Idea
         {
@@ -47,12 +47,12 @@ public class IdeaService(IIdeaRepository ideaRepository) : IIdeaService
     /// <inheritdoc />
     public async Task<bool> DeleteIdeaAsync(string id, CancellationToken cancellationToken = default) 
         => string.IsNullOrWhiteSpace(id)
-            ? throw new ArgumentNullException(nameof(id))
+            ? throw new ArgumentNullException(nameof(id), "Idea ID cannot be null or empty")
             : await _ideaRepository.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
     public async Task<Models.Idea> GetIdeaByIdAsync(string id, CancellationToken cancellationToken = default) 
         => string.IsNullOrWhiteSpace(id)
-            ? throw new ArgumentNullException(nameof(id))
+            ? throw new ArgumentNullException(nameof(id), "Idea ID cannot be null or empty")
             : await _ideaRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
 }

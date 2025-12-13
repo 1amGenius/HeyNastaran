@@ -19,9 +19,8 @@ public class QuoteService(IQuoteRepository quoteRepository) : IQuoteService
         string author = "unknown",
         CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
-
-        ArgumentException.ThrowIfNullOrWhiteSpace(text);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(text, nameof(text));
 
         var newNote = new Models.Quote
         {

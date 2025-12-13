@@ -27,9 +27,9 @@ public class UserService(IUserRepository userRepository) : IUserService
         string timezone = "UTC",
         CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(username);
-        ArgumentException.ThrowIfNullOrWhiteSpace(firstName);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(username, nameof(username));
+        ArgumentException.ThrowIfNullOrWhiteSpace(firstName, nameof(firstName));
 
         var newUser = new Models.User
         {
@@ -52,7 +52,7 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> GetUserByTelegramIdAsync(long telegramId, CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(telegramId, nameof(telegramId));
 
         IAsyncEnumerable<Models.User> users = _userRepository.GetByTelegramIdAsync(telegramId, cancellationToken);
         return await users.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
@@ -73,8 +73,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> UpdateUserAsync(string id, UserUpdateDto update, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentNullException.ThrowIfNull(update);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(update, nameof(update));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -132,8 +132,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> UpdateLocationAsync(string id, LocationDto location, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentNullException.ThrowIfNull(location);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(location, nameof(location));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -158,8 +158,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> UpdateTimezoneAsync(string id, string timezone, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentException.ThrowIfNullOrWhiteSpace(timezone);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentException.ThrowIfNullOrWhiteSpace(timezone, nameof(timezone));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -178,8 +178,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> UpdatePreferencesAsync(string id, PreferencesDto prefs, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentNullException.ThrowIfNull(prefs);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(prefs, nameof(prefs));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -200,8 +200,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> AddFavoriteArtistAsync(string id, string artist, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentException.ThrowIfNullOrWhiteSpace(artist);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentException.ThrowIfNullOrWhiteSpace(artist, nameof(artist));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -224,8 +224,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> RemoveFavoriteArtistAsync(string id, string artist, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentException.ThrowIfNullOrWhiteSpace(artist);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentException.ThrowIfNullOrWhiteSpace(artist, nameof(artist));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -245,8 +245,8 @@ public class UserService(IUserRepository userRepository) : IUserService
     /// <inheritdoc />
     public async Task<Models.User> ReplaceFavoriteArtistsAsync(string id, IEnumerable<string> artists, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        ArgumentNullException.ThrowIfNull(artists);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
+        ArgumentNullException.ThrowIfNull(artists, nameof(artists));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
@@ -269,7 +269,7 @@ public class UserService(IUserRepository userRepository) : IUserService
         DateTime? weather = null,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(id, nameof(id));
 
         Models.User user = await _userRepository.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (user is null)
