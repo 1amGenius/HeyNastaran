@@ -1,8 +1,6 @@
 ﻿using Nastaran_bot.Contracts.User;
 using Nastaran_bot.Repositories.User;
 
-using Telegram.Bot.Types;
-
 namespace Nastaran_bot.Services.User;
 
 /// <summary>

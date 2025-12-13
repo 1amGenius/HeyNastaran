@@ -15,6 +15,12 @@ public interface IIdeaService
     /// <param name="favorite">Whether the idea is marked as a favorite.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The created idea.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if content is null or whitespace.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if TelegramId is not a valid identifier (e.g., non-positive).
+    /// </exception>
     public Task<Models.Idea> AddIdeaAsync(
         long telegramId,
         string content,
@@ -29,6 +35,9 @@ public interface IIdeaService
     /// <param name="telegramId">Telegram user identifier.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>An asynchronous stream of ideas.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if TelegramId is not a valid identifier (e.g., non-positive).
+    /// </exception>
     public IAsyncEnumerable<Models.Idea> GetUserIdeasAsync(
         long telegramId,
         CancellationToken cancellationToken = default);
@@ -39,6 +48,9 @@ public interface IIdeaService
     /// <param name="id">Idea identifier.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True if the idea was deleted.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if id is null or whitespace.
+    /// </exception>
     public Task<bool> DeleteIdeaAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -47,5 +59,8 @@ public interface IIdeaService
     /// <param name="id">Idea identifier.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The idea or null.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if id is null or whitespace.
+    /// </exception>
     public Task<Models.Idea> GetIdeaByIdAsync(string id, CancellationToken cancellationToken = default);
 }
