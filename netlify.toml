@@ -1,0 +1,8 @@
+[build]
+  functions = "publish"   # points to your published Functions folder
+
+[[redirects]]
+  from = "/api/telegram/update"
+  to = "/.netlify/functions/telegramwebhook"
+  status = 200
+  force = true
