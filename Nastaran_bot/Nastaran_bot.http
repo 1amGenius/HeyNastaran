@@ -1,0 +1,6 @@
+@Nastaran_bot_HostAddress = http://localhost:5255
+
+GET {{Nastaran_bot_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
