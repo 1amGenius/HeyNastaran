@@ -27,7 +27,7 @@ public static class TelegramWebhook
             return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
-        Update? update;
+        Update update;
         try
         {
             update = JsonSerializer.Deserialize<Update>(body);

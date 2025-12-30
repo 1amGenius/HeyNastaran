@@ -40,16 +40,18 @@ public static class Bootstrapper
         // ========================
         // MongoDB
         // ========================
-        _ = services.AddSingleton<IMongoClient>(_ =>
-            new MongoClient(configuration.GetConnectionString("MongoDb")));
+        string mongoConnection = configuration.GetConnectionString("MongoDb")
+                              ?? throw new InvalidOperationException("MongoDb connection string missing");
+
+        _ = services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConnection));
 
         // ========================
         // Telegram Bot Client
         // ========================
-        _ = services.AddSingleton<ITelegramBotClient>(_ =>
-            new TelegramBotClient(
-                configuration.GetConnectionString("BotToken")!
-            ));
+        string botToken = configuration.GetConnectionString("BotToken")
+                       ?? throw new InvalidOperationException("BotToken connection string missing");
+
+        _ = services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(botToken));
 
         // ========================
         // Weather HTTP + API
