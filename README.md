@@ -90,7 +90,7 @@ TelegramBotService (orchestrator)
 		|
 		▼
 Domain Services
-(UserService, QuoteService, IdeaServirferfefce, InspirationService)
+(UserService, QuoteService, IdeaService, InspirationService)
 		|
 		▼
 Repositories
